@@ -33,13 +33,64 @@
     position: relative;
   }
 
-  /* Sidebar */
+  /* ─── In-App Toast Notification (slim pill) ─── */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(70px);
+    background: rgba(26,18,0,0.88);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(245,200,66,0.95);
+    padding: 10px 14px 10px 12px;
+    border-radius: 40px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 2000;
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), opacity 0.25s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    pointer-events: none;
+  }
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .toast-icon { flex-shrink: 0; font-size: 14px; line-height: 1; }
+  .toast-body { display: flex; align-items: center; gap: 6px; }
+  .toast-title { font-size: 12px; font-weight: 800; }
+  .toast-msg { font-size: 11px; font-weight: 500; opacity: 0.7; }
+  .toast-action {
+    flex-shrink: 0;
+    background: rgba(245,200,66,0.15);
+    color: rgba(245,200,66,0.95);
+    border: 1px solid rgba(245,200,66,0.3);
+    border-radius: 20px;
+    padding: 5px 10px;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    transition: background 0.15s;
+    margin-left: 2px;
+  }
+  .toast-action:hover { background: rgba(245,200,66,0.25); }
+
+  /* ─── Sidebar ─── */
   .sidebar-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
   }
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-  
+
   .sidebar {
     position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 80vw;
     background: var(--surface); z-index: 999;
@@ -48,22 +99,55 @@
     display: flex; flex-direction: column; overflow-y: auto;
   }
   .sidebar.active { transform: translateX(0); }
-  
+
   .set-header {
     display: flex; align-items: center; gap: 12px; padding: 24px 20px;
     font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
     cursor: pointer; border-bottom: 1px solid var(--divider);
   }
-  .set-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 20px; cursor: pointer; border-bottom: 1px solid var(--divider);
-    transition: background 0.2s;
+  .set-section-label {
+    font-size: 10px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 1.2px; color: var(--text-muted);
+    padding: 18px 20px 8px;
   }
-  .set-item:hover { background: rgba(0,0,0,0.03); }
-  .set-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .set-sub { font-size: 12px; font-weight: 500; color: rgba(26, 18, 0, 0.6); }
+  .set-item {
+    padding: 14px 20px; border-bottom: 1px solid var(--divider);
+  }
+  .set-item-title {
+    font-size: 13px; font-weight: 700; color: var(--text);
+    margin-bottom: 10px;
+  }
+  /* Toggle pill group */
+  .toggle-group {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .toggle-btn {
+    padding: 7px 14px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.15);
+    background: transparent; color: var(--text-muted);
+    font-size: 12px; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+  }
+  .toggle-btn:hover { background: rgba(0,0,0,0.05); }
+  .toggle-btn.active {
+    background: var(--text); color: var(--bg);
+    border-color: var(--text);
+  }
+  .set-action-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--divider);
+    cursor: pointer; transition: background 0.15s;
+  }
+  .set-action-item:hover { background: rgba(0,0,0,0.03); }
+  .set-action-item .set-title { font-size: 15px; font-weight: 700; color: var(--text); }
+  .set-action-item .set-sub { font-size: 12px; font-weight: 500; color: rgba(26,18,0,0.6); margin-top: 2px; }
+  .set-action-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
 
-  /* Interactive Search Overlay */
+  /* ─── Search Overlay ─── */
   .search-overlay {
     position: fixed; inset: 0; background: var(--bg); z-index: 1000;
     padding: 52px 24px 24px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -78,18 +162,14 @@
   }
   .search-input:focus { background: rgba(255,255,255,0.5); }
   .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
-  .search-close {
-    font-weight: 800; background: transparent; border: none; cursor: pointer; color: var(--text); font-size: 14px; text-transform: uppercase;
-  }
+  .search-close { font-weight: 800; background: transparent; border: none; cursor: pointer; color: var(--text); font-size: 14px; text-transform: uppercase; }
   .search-results { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-  .search-item {
-    padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.06); cursor: pointer; transition: background 0.15s;
-  }
+  .search-item { padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.06); cursor: pointer; transition: background 0.15s; }
   .search-item:hover { background: rgba(0,0,0,0.12); }
   .search-city { font-weight: 800; font-size: 18px; }
   .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
 
-  /* Header */
+  /* ─── Header ─── */
   .header {
     display: flex; align-items: flex-start; justify-content: space-between;
     padding: 0 24px; animation: fadeUp 0.45s ease both;
@@ -97,7 +177,6 @@
   .header-left { display: flex; align-items: flex-start; gap: 16px; }
   .menu-btn { margin-top: 4px; }
   .city-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
-  
   .header-actions { display: flex; gap: 6px; margin-top: 8px; }
   .icon-btn {
     width: 28px; height: 28px; border-radius: 6px;
@@ -105,13 +184,14 @@
     cursor: pointer; transition: background 0.15s; flex-shrink: 0;
   }
   .icon-btn:hover { background: rgba(0,0,0,0.18); }
-  
   .live-badge {
     background: var(--text); color: var(--bg); font-size: 10px; font-weight: 800;
-    padding: 5px 10px; border-radius: 20px; letter-spacing: 0.5px; margin-top: 4px; transition: opacity 0.3s;
+    padding: 5px 10px; border-radius: 20px; letter-spacing: 0.5px; margin-top: 4px;
+    transition: opacity 0.3s, transform 0.3s;
   }
+  .live-badge.hidden { opacity: 0; transform: scale(0.9); }
 
-  /* Temp */
+  /* ─── Hero (today only) ─── */
   .temp-section { padding: 24px 24px 0; display: flex; align-items: flex-start; gap: 14px; animation: fadeUp 0.5s ease 0.1s both; }
   .sun-icon { margin-top: 10px; flex-shrink: 0; }
   .temp-row { display: flex; align-items: baseline; line-height: 1; }
@@ -121,33 +201,63 @@
   .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; transition: opacity 0.3s; }
   .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; }
 
-  /* Chart */
+  /* ─── Today's Chart ─── */
   .chart-section { padding: 6px 16px 0; animation: fadeUp 0.5s ease 0.25s both; }
   .chart-svg { width: 100%; height: 180px; overflow: visible; }
   .time-axis { display: flex; justify-content: space-between; padding: 2px 20px 0; }
   .time-tick { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
 
-  /* Divider */
+  /* ─── Divider ─── */
   .divider { height: 1px; background: var(--divider); margin: 16px 24px 0; }
 
-  /* Forecast */
+  /* ─── Forecast Rows ─── */
   .forecast-section { padding: 4px 0; animation: fadeUp 0.5s ease 0.4s both; }
   .forecast-row {
-    padding: 11px 24px; border-bottom: 1px solid var(--divider);
-    display: flex; flex-direction: column; gap: 2px;
+    border-bottom: 1px solid var(--divider);
     cursor: pointer; transition: background 0.15s;
+    overflow: hidden;
   }
-  .forecast-row:hover, .forecast-row.active { background: rgba(0,0,0,0.06); }
+  .forecast-row:hover { background: rgba(0,0,0,0.04); }
   .forecast-row:last-child { border-bottom: none; }
+
+  .forecast-row-header {
+    padding: 11px 24px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
   .forecast-day-header { display: flex; align-items: center; gap: 8px; }
   .forecast-dot {
     width: 26px; height: 26px; border-radius: 6px; background: rgba(0,0,0,0.10);
-    display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; transition: background 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800;
+    transition: background 0.2s, color 0.2s;
   }
-  .forecast-row.active .forecast-dot { background: var(--text); color: var(--bg); }
+  .forecast-row.expanded .forecast-dot { background: var(--text); color: var(--bg); }
   .forecast-date { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .forecast-condition { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; padding-left: 34px; }
   .forecast-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); padding-left: 34px; }
+
+  /* ─── Expandable Mini-Chart per forecast day ─── */
+  .forecast-expand {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .forecast-row.expanded .forecast-expand {
+    max-height: 200px;
+  }
+  .mini-chart-wrap {
+    padding: 4px 16px 12px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+  }
+  .forecast-row.expanded .mini-chart-wrap {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .mini-chart-svg { width: 100%; height: 100px; overflow: visible; }
+  .mini-time-axis { display: flex; justify-content: space-between; padding: 2px 10px 0; }
+  .mini-time-tick { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
 
   @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.06); } }
   .sun-anim { animation: pulse-glow 3s ease-in-out infinite; transform-origin: center; }
@@ -156,20 +266,70 @@
 </head>
 <body>
 
+<!-- Toast notification (slim pill, replaces browser alert) -->
+<div class="toast" id="toast">
+  <div class="toast-icon" id="toast-icon">📍</div>
+  <div class="toast-body">
+    <span class="toast-title" id="toast-title">Location Denied</span>
+    <span class="toast-msg" id="toast-msg"> · Tap Search to find your city</span>
+  </div>
+  <button class="toast-action" id="toast-action">Search</button>
+</div>
+
 <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 <div class="sidebar" id="sidebar">
   <div class="set-header" onclick="toggleSidebar()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     SETTINGS
   </div>
+
+  <div class="set-section-label">Units</div>
+
   <div class="set-item">
-    <div><div class="set-title">Temperature</div><div class="set-sub">Celsius - °C</div></div>
+    <div class="set-item-title">Temperature</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" data-group="temp" data-val="C" onclick="selectToggle(this, 'temp')">°C Celsius</button>
+      <button class="toggle-btn" data-group="temp" data-val="F" onclick="selectToggle(this, 'temp')">°F Fahrenheit</button>
+    </div>
   </div>
+
   <div class="set-item">
-    <div><div class="set-title">Wind Speed</div><div class="set-sub">Kilometers per hour - km/h</div></div>
+    <div class="set-item-title">Wind Speed</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" data-group="wind" data-val="kmh" onclick="selectToggle(this, 'wind')">km/h</button>
+      <button class="toggle-btn" data-group="wind" data-val="mph" onclick="selectToggle(this, 'wind')">mph</button>
+      <button class="toggle-btn" data-group="wind" data-val="ms" onclick="selectToggle(this, 'wind')">m/s</button>
+    </div>
   </div>
-  <div class="set-item" onclick="document.getElementById('btn-gps').click(); toggleSidebar();">
-    <div><div class="set-title">Update Location</div><div class="set-sub">Fetch current GPS data</div></div>
+
+  <div class="set-item">
+    <div class="set-item-title">Time Format</div>
+    <div class="toggle-group">
+      <button class="toggle-btn active" data-group="time" data-val="12" onclick="selectToggle(this, 'time')">12h</button>
+      <button class="toggle-btn" data-group="time" data-val="24" onclick="selectToggle(this, 'time')">24h</button>
+    </div>
+  </div>
+
+  <div class="set-section-label">Location</div>
+
+  <div class="set-action-item" onclick="document.getElementById('btn-gps').click(); toggleSidebar();">
+    <div class="set-action-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+    </div>
+    <div>
+      <div class="set-title">Update Location</div>
+      <div class="set-sub">Fetch current GPS position</div>
+    </div>
+  </div>
+
+  <div class="set-action-item" onclick="openSearch(); toggleSidebar();">
+    <div class="set-action-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div>
+      <div class="set-title">Search City</div>
+      <div class="set-sub">Find weather for any location</div>
+    </div>
   </div>
 </div>
 
@@ -178,8 +338,7 @@
     <input type="text" id="search-input" class="search-input" placeholder="Search City..." autocomplete="off">
     <button class="search-close" onclick="closeSearch()">Cancel</button>
   </div>
-  <div class="search-results" id="search-results">
-    </div>
+  <div class="search-results" id="search-results"></div>
 </div>
 
 <div class="app">
@@ -194,75 +353,37 @@
           <div class="icon-btn" id="btn-gps" title="Use GPS Location">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           </div>
-          <div class="icon-btn" onclick="openSearch()" title="Add City">
+          <div class="icon-btn" onclick="openSearch()" title="Search City">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
         </div>
       </div>
     </div>
-    <div class="live-badge" id="live-badge">LIVE</div>
+    <div class="live-badge hidden" id="live-badge">LIVE</div>
   </div>
 
+  <!-- Hero: Today only -->
   <div class="temp-section" id="hero-section">
-    <div class="sun-icon">
-      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" class="sun-anim">
-        <circle cx="16" cy="16" r="7" fill="#1a1200" opacity="0.85"/>
-        <line x1="16" y1="1" x2="16" y2="5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="16" y1="27" x2="16" y2="31" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="1" y1="16" x2="5" y2="16" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="27" y1="16" x2="31" y2="16" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="5.5" y1="5.5" x2="8.3" y2="8.3" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="23.7" y1="23.7" x2="26.5" y2="26.5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="26.5" y1="5.5" x2="23.7" y2="8.3" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="8.3" y1="23.7" x2="5.5" y2="26.5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      </svg>
+    <div class="sun-icon" id="weather-icon">
+      <!-- filled by renderTodayHero() -->
     </div>
     <div>
       <div class="temp-row">
-        <span class="temp-current">--</span>
-        <span class="temp-unit">°</span>
+        <span class="temp-current" id="temp-current">--</span>
+        <span class="temp-unit" id="temp-unit">°</span>
         <span class="temp-divider">/</span>
-        <span class="temp-low">--°</span>
+        <span class="temp-low" id="temp-low">--°</span>
       </div>
-      <div class="condition">--</div>
+      <div class="condition" id="condition">--</div>
     </div>
   </div>
 
+  <!-- Today chart -->
   <div class="chart-section">
-    <svg class="chart-svg" viewBox="0 0 358 175" xmlns="http://www.w3.org/2000/svg">
-      <path id="chart-path"
-        d="M 10 135 C 25 138, 55 140, 70 138 C 90 136, 100 120, 120 105 C 140 88, 155 55, 179 48 C 203 42, 220 58, 238 72 C 255 85, 268 112, 285 128 C 300 140, 330 142, 348 140"
-        fill="none" stroke="#1a1200" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
-
-      <text class="chart-temp-text" x="10" y="122" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-      <text class="chart-temp-text" x="70" y="126" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-      <text class="chart-temp-text" x="120" y="93" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-      <text class="chart-temp-text" x="155" y="42" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-      <text class="chart-temp-text" x="179" y="35" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.95">--°</text>
-      <text class="chart-temp-text" x="238" y="58" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-      <text class="chart-temp-text" x="285" y="115" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
-
-      <line x1="109" y1="38" x2="109" y2="155" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3,4"/>
-      <text id="sunrise-time" x="109" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">--:--</text>
-
-      <line x1="284" y1="38" x2="284" y2="155" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3,4"/>
-      <text id="sunset-time" x="284" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">--:--</text>
-
-      <line x1="6" y1="150" x2="352" y2="150" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
-      
-      <circle id="live-dot" cx="167" cy="51" r="5" fill="#1a1200" opacity="0.85"/>
-      <circle id="live-pulse" cx="167" cy="51" r="10" fill="#1a1200" opacity="0.10"/>
+    <svg class="chart-svg" id="today-chart-svg" viewBox="0 0 358 160" xmlns="http://www.w3.org/2000/svg">
+      <line x1="6" y1="148" x2="352" y2="148" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
     </svg>
-
-    <div class="time-axis" id="time-axis">
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-      <span class="time-tick">--</span>
-    </div>
+    <div class="time-axis" id="time-axis"></div>
   </div>
 
   <div class="divider"></div>
@@ -275,18 +396,59 @@
 const WX_URL = 'https://api.open-meteo.com/v1/forecast';
 const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const NOM_URL = 'https://nominatim.openstreetmap.org/reverse';
-let globalWeatherData = null;
 
-// Sidebar Logic
+let globalWeatherData = null;
+let settings = { temp: 'C', wind: 'kmh', time: '12' };
+let expandedRow = null;
+let toastTimer = null;
+
+// ─── Toast System (slim pill, replaces all alert() calls) ─────────────────
+function showToast(icon, title, msg, actionLabel, actionFn) {
+  clearTimeout(toastTimer);
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg ? ' · ' + msg : '';
+  const btn = document.getElementById('toast-action');
+  if (actionLabel) {
+    btn.textContent = actionLabel;
+    btn.onclick = () => { hideToast(); if(actionFn) actionFn(); };
+    btn.style.display = '';
+  } else {
+    btn.style.display = 'none';
+  }
+  document.getElementById('toast').classList.add('show');
+  toastTimer = setTimeout(hideToast, 5000);
+}
+function hideToast() {
+  document.getElementById('toast').classList.remove('show');
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('active');
   document.getElementById('sidebar-overlay').classList.toggle('active');
 }
 
-// Search Logic
+// ─── Settings Toggle ──────────────────────────────────────────────────────
+function selectToggle(el, group) {
+  document.querySelectorAll(`.toggle-btn[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  settings[group] = el.dataset.val;
+  if (globalWeatherData) {
+    renderTodayHero();
+    renderTodayChart();
+    renderForecastList();
+    if (expandedRow !== null) {
+      const rows = document.querySelectorAll('.forecast-row');
+      if (rows[expandedRow]) renderMiniChart(rows[expandedRow], expandedRow + 1);
+    }
+  }
+}
+
+// ─── Search ───────────────────────────────────────────────────────────────
 function openSearch() {
   document.getElementById('search-overlay').classList.add('active');
-  document.getElementById('search-input').focus();
+  setTimeout(() => document.getElementById('search-input').focus(), 50);
 }
 function closeSearch() {
   document.getElementById('search-overlay').classList.remove('active');
@@ -298,25 +460,18 @@ let searchTimeout;
 document.getElementById('search-input').addEventListener('input', (e) => {
   clearTimeout(searchTimeout);
   const query = e.target.value.trim();
-  if(query.length < 2) {
-    document.getElementById('search-results').innerHTML = '';
-    return;
-  }
-  
+  if (query.length < 2) { document.getElementById('search-results').innerHTML = ''; return; }
   searchTimeout = setTimeout(async () => {
     try {
       const d = await jfetch(`${GEO_URL}?name=${encodeURIComponent(query)}&count=5&format=json`);
       const res = d.results || [];
       const html = res.map(r => `
-        <div class="search-item" onclick="selectCity(${r.latitude}, ${r.longitude}, '${r.name}')">
+        <div class="search-item" onclick="selectCity(${r.latitude}, ${r.longitude}, '${r.name.replace(/'/g,"\\'")}')">
           <div class="search-city">${r.name}</div>
           <div class="search-country">${r.admin1 ? r.admin1 + ', ' : ''}${r.country || ''}</div>
-        </div>
-      `).join('');
+        </div>`).join('');
       document.getElementById('search-results').innerHTML = html || '<div class="search-item">No results found</div>';
-    } catch(err) {
-      document.getElementById('search-results').innerHTML = '<div class="search-item">Error fetching data</div>';
-    }
+    } catch { document.getElementById('search-results').innerHTML = '<div class="search-item">Error fetching data</div>'; }
   }, 300);
 });
 
@@ -325,24 +480,166 @@ function selectCity(lat, lon, name) {
   fetchWeather(lat, lon, name);
 }
 
-// Weather Codes Translator
-function wmoLabel(code){
-  if(code===0) return 'Sunny';
-  if(code===1) return 'Mostly Sunny';
-  if(code===2) return 'Partly Cloudy';
-  if(code===3) return 'Overcast';
-  if(code<=48) return 'Fog';
-  if(code<=57) return 'Drizzle';
-  if(code<=67) return 'Rain';
-  if(code<=77) return 'Snow';
-  if(code<=82) return 'Showers';
-  if(code<=86) return 'Snow Showers';
+// ─── Weather Helpers ──────────────────────────────────────────────────────
+function wmoLabel(code) {
+  if (code === 0) return 'Sunny';
+  if (code === 1) return 'Mostly Sunny';
+  if (code === 2) return 'Partly Cloudy';
+  if (code === 3) return 'Overcast';
+  if (code <= 48) return 'Fog';
+  if (code <= 57) return 'Drizzle';
+  if (code <= 67) return 'Rain';
+  if (code <= 77) return 'Snow';
+  if (code <= 82) return 'Showers';
+  if (code <= 86) return 'Snow Showers';
   return 'Storms';
+}
+
+// Dynamic weather icon SVGs keyed by condition category
+function wmoIcon(code) {
+  const c = '#1a1200';
+  const op = 'opacity="0.85"';
+
+  // ☀️ Sunny / Clear
+  if (code === 0 || code === 1) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" class="sun-anim">
+      <circle cx="16" cy="16" r="7" fill="${c}" ${op}/>
+      <line x1="16" y1="1" x2="16" y2="5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="16" y1="27" x2="16" y2="31" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="1" y1="16" x2="5" y2="16" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="27" y1="16" x2="31" y2="16" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="5.5" y1="5.5" x2="8.3" y2="8.3" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="23.7" y1="23.7" x2="26.5" y2="26.5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="26.5" y1="5.5" x2="23.7" y2="8.3" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+      <line x1="8.3" y1="23.7" x2="5.5" y2="26.5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+    </svg>`;
+
+  // ⛅ Partly Cloudy
+  if (code === 2) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <circle cx="13" cy="12" r="5" fill="${c}" opacity="0.5"/>
+      <line x1="13" y1="3" x2="13" y2="6" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+      <line x1="5" y1="12" x2="8" y2="12" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+      <line x1="6.8" y1="6.8" x2="9" y2="9" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+      <line x1="19.2" y1="6.8" x2="17" y2="9" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+      <rect x="5" y="17" width="22" height="10" rx="5" fill="${c}" ${op}/>
+      <circle cx="11" cy="17" r="5" fill="${c}" ${op}/>
+      <circle cx="20" cy="16" r="6" fill="${c}" ${op}/>
+    </svg>`;
+
+  // ☁️ Overcast
+  if (code === 3) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="4" y="18" width="24" height="10" rx="5" fill="${c}" ${op}/>
+      <circle cx="10" cy="18" r="6" fill="${c}" ${op}/>
+      <circle cx="20" cy="16" r="7" fill="${c}" ${op}/>
+      <circle cx="26" cy="19" r="5" fill="${c}" ${op}/>
+    </svg>`;
+
+  // 🌫️ Fog / Mist
+  if (code <= 48) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="4" y="8" width="24" height="3" rx="1.5" fill="${c}" opacity="0.35"/>
+      <rect x="2" y="14" width="28" height="3" rx="1.5" fill="${c}" opacity="0.55"/>
+      <rect x="6" y="20" width="20" height="3" rx="1.5" fill="${c}" opacity="0.35"/>
+      <rect x="4" y="26" width="24" height="3" rx="1.5" fill="${c}" opacity="0.25"/>
+    </svg>`;
+
+  // 🌧️ Drizzle / Light rain
+  if (code <= 57) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="5" y="6" width="22" height="10" rx="5" fill="${c}" ${op}/>
+      <circle cx="11" cy="10" r="5" fill="${c}" ${op}/>
+      <circle cx="21" cy="8" r="6" fill="${c}" ${op}/>
+      <line x1="11" y1="20" x2="9" y2="27" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+      <line x1="18" y1="20" x2="16" y2="27" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+    </svg>`;
+
+  // 🌧️ Rain
+  if (code <= 67) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="5" y="5" width="22" height="10" rx="5" fill="${c}" ${op}/>
+      <circle cx="11" cy="9" r="5" fill="${c}" ${op}/>
+      <circle cx="21" cy="7" r="6" fill="${c}" ${op}/>
+      <line x1="9" y1="19" x2="7" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+      <line x1="16" y1="19" x2="14" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+      <line x1="23" y1="19" x2="21" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+    </svg>`;
+
+  // ❄️ Snow
+  if (code <= 77) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="5" y="5" width="22" height="9" rx="4.5" fill="${c}" ${op}/>
+      <circle cx="11" cy="9" r="5" fill="${c}" ${op}/>
+      <circle cx="21" cy="7" r="6" fill="${c}" ${op}/>
+      <circle cx="9" cy="22" r="2" fill="${c}" opacity="0.7"/>
+      <circle cx="16" cy="25" r="2" fill="${c}" opacity="0.7"/>
+      <circle cx="23" cy="21" r="2" fill="${c}" opacity="0.7"/>
+      <circle cx="13" cy="20" r="1.5" fill="${c}" opacity="0.5"/>
+      <circle cx="20" cy="23" r="1.5" fill="${c}" opacity="0.5"/>
+    </svg>`;
+
+  // 🌦️ Showers
+  if (code <= 82) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <circle cx="14" cy="11" r="5" fill="${c}" opacity="0.5"/>
+      <line x1="14" y1="2" x2="14" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
+      <line x1="7" y1="11" x2="10" y2="11" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
+      <line x1="8" y1="6" x2="10.2" y2="8.2" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
+      <rect x="7" y="15" width="18" height="8" rx="4" fill="${c}" ${op}/>
+      <circle cx="13" cy="15" r="4.5" fill="${c}" ${op}/>
+      <circle cx="21" cy="14" r="5.5" fill="${c}" ${op}/>
+      <line x1="12" y1="25" x2="10" y2="31" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+      <line x1="19" y1="25" x2="17" y2="31" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
+    </svg>`;
+
+  // 🌨️ Snow Showers
+  if (code <= 86) return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="6" y="7" width="20" height="9" rx="4.5" fill="${c}" ${op}/>
+      <circle cx="12" cy="10" r="4.5" fill="${c}" ${op}/>
+      <circle cx="21" cy="9" r="5.5" fill="${c}" ${op}/>
+      <circle cx="9" cy="23" r="2" fill="${c}" opacity="0.65"/>
+      <circle cx="16" cy="26" r="2" fill="${c}" opacity="0.65"/>
+      <circle cx="23" cy="22" r="2" fill="${c}" opacity="0.65"/>
+      <line x1="13" y1="21" x2="11" y2="27" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+      <line x1="20" y1="21" x2="18" y2="27" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+    </svg>`;
+
+  // ⛈️ Storms / Thunderstorm
+  return `
+    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
+      <rect x="4" y="5" width="24" height="10" rx="5" fill="${c}" ${op}/>
+      <circle cx="10" cy="9" r="5" fill="${c}" ${op}/>
+      <circle cx="22" cy="7" r="6.5" fill="${c}" ${op}/>
+      <polyline points="18,17 13,24 17,24 12,31" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+    </svg>`;
+}
+
+function cvtTemp(c) {
+  return settings.temp === 'F' ? Math.round(c * 9/5 + 32) : Math.round(c);
+}
+function tempSuffix() { return settings.temp === 'F' ? '°F' : '°C'; }
+
+function fmtTime(dateStr) {
+  const d = new Date(dateStr);
+  if (settings.time === '24') {
+    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  }
+  let h = d.getHours() % 12 || 12;
+  return `${h}${d.getMinutes() === 0 ? '' : ':' + String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function fmtHour(dateStr) {
+  const d = new Date(dateStr);
+  if (settings.time === '24') return String(d.getHours()).padStart(2,'0');
+  let h = d.getHours() % 12 || 12;
+  return String(h);
 }
 
 async function jfetch(url) {
   const res = await fetch(url);
-  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return await res.json();
 }
 
@@ -350,10 +647,11 @@ async function revGeo(lat, lon) {
   try {
     const d = await jfetch(`${NOM_URL}?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
     const a = d.address || {};
-    return a.city || a.town || a.village || 'Unknown';
+    return a.city || a.town || a.village || 'Local Area';
   } catch { return 'Local Area'; }
 }
 
+// ─── Fetch Weather ─────────────────────────────────────────────────────────
 async function fetchWeather(lat, lon, cityName) {
   document.getElementById('display-city').textContent = cityName;
   const params = new URLSearchParams({
@@ -365,124 +663,215 @@ async function fetchWeather(lat, lon, cityName) {
     timezone: 'auto',
     forecast_days: 7
   });
-
   try {
     globalWeatherData = await jfetch(`${WX_URL}?${params}`);
-    renderDay(0); // Render Today by default
+    expandedRow = null;
+    renderTodayHero();
+    renderTodayChart();
     renderForecastList();
   } catch (e) {
-    alert("Failed to fetch weather data.");
+    showToast('⚠️', 'Network Error', 'Failed to fetch weather data.', null, null);
   }
 }
 
-// Interactive rendering of selected day
-function renderDay(dayIndex) {
-  if(!globalWeatherData) return;
-  const data = globalWeatherData;
-  
-  // Highlight active row in forecast list
-  document.querySelectorAll('.forecast-row').forEach((row, idx) => {
-    row.classList.toggle('active', idx === dayIndex - 1);
+// ─── Render Today Hero ─────────────────────────────────────────────────────
+function renderTodayHero() {
+  const d = globalWeatherData;
+  document.getElementById('temp-current').textContent = cvtTemp(d.current.temperature_2m);
+  document.getElementById('temp-unit').textContent = '°';
+  document.getElementById('temp-low').textContent = cvtTemp(d.daily.temperature_2m_min[0]) + '°';
+  document.getElementById('condition').textContent = wmoLabel(d.current.weather_code);
+  document.getElementById('live-badge').classList.remove('hidden');
+  // Update weather icon dynamically
+  document.getElementById('weather-icon').innerHTML = wmoIcon(d.current.weather_code);
+}
+
+// ─── Build SVG Chart Path (shared by today + mini) ────────────────────────
+function buildChartPath(temps, svgW, svgH, padX, padY) {
+  const minT = Math.min(...temps);
+  const maxT = Math.max(...temps);
+  const range = maxT - minT || 1;
+  const pts = temps.map((t, i) => {
+    const x = padX + (i / (temps.length - 1)) * (svgW - padX * 2);
+    const y = svgH - padY - ((t - minT) / range) * (svgH - padY * 2);
+    return [x, y];
   });
-
-  const isToday = dayIndex === 0;
-  
-  // Header / Hero Update
-  if (isToday) {
-    document.querySelector('.temp-current').textContent = Math.round(data.current.temperature_2m);
-    document.querySelector('.condition').textContent = wmoLabel(data.current.weather_code);
-    document.getElementById('live-badge').style.opacity = '1';
-    document.getElementById('live-dot').style.display = 'block';
-    document.getElementById('live-pulse').style.display = 'block';
-  } else {
-    document.querySelector('.temp-current').textContent = Math.round(data.daily.temperature_2m_max[dayIndex]);
-    document.querySelector('.condition').textContent = wmoLabel(data.daily.weather_code[dayIndex]);
-    document.getElementById('live-badge').style.opacity = '0';
-    document.getElementById('live-dot').style.display = 'none';
-    document.getElementById('live-pulse').style.display = 'none';
+  // Smooth curve via cubic bezier
+  let path = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const cp1x = pts[i-1][0] + (pts[i][0] - pts[i-1][0]) * 0.4;
+    const cp1y = pts[i-1][1];
+    const cp2x = pts[i][0] - (pts[i][0] - pts[i-1][0]) * 0.4;
+    const cp2y = pts[i][1];
+    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i][0]} ${pts[i][1]}`;
   }
-  document.querySelector('.temp-low').textContent = Math.round(data.daily.temperature_2m_min[dayIndex]) + '°';
-
-  // Chart Update
-  const sr = new Date(data.daily.sunrise[dayIndex]);
-  const ss = new Date(data.daily.sunset[dayIndex]);
-  document.getElementById('sunrise-time').textContent = `${String(sr.getHours()).padStart(2,'0')}:${String(sr.getMinutes()).padStart(2,'0')}`;
-  document.getElementById('sunset-time').textContent = `${String(ss.getHours()).padStart(2,'0')}:${String(ss.getMinutes()).padStart(2,'0')}`;
-
-  const timeTicks = document.querySelectorAll('.time-tick');
-  const tempTexts = document.querySelectorAll('.chart-temp-text');
-  
-  // Find where hourly data starts for the selected day
-  const targetDateStr = data.daily.time[dayIndex];
-  let hourStartIndex = data.hourly.time.findIndex(t => t.startsWith(targetDateStr));
-  
-  // Default to 6am for chart start on future days, or current hour for today
-  if (isToday) {
-     const now = new Date();
-     let currentIdx = data.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
-     hourStartIndex = currentIdx > 0 ? currentIdx : hourStartIndex;
-  } else {
-     hourStartIndex += 6; 
-  }
-
-  for(let i = 0; i < 7; i++) {
-    const hrIndex = hourStartIndex + (i * 3); 
-    if(hrIndex < data.hourly.time.length) {
-      const hrDate = new Date(data.hourly.time[hrIndex]);
-      let h12 = hrDate.getHours() % 12 || 12;
-      timeTicks[i].textContent = h12;
-      tempTexts[i].textContent = Math.round(data.hourly.temperature_2m[hrIndex]) + '°';
-    }
-  }
+  return { path, pts, minT, maxT };
 }
 
+// ─── Render Today Chart ───────────────────────────────────────────────────
+function renderTodayChart() {
+  const d = globalWeatherData;
+  const svg = document.getElementById('today-chart-svg');
+  const timeAxis = document.getElementById('time-axis');
+
+  // Find hours for today (indices 0–23 of today)
+  const today = d.daily.time[0];
+  const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
+  const now = new Date();
+
+  // Pick 7 evenly spread hours across the day
+  const step = 3;
+  const hours = [];
+  for (let i = 0; i < 7; i++) hours.push(startIdx + i * step);
+
+  const temps = hours.map(idx => cvtTemp(d.hourly.temperature_2m[idx]));
+  const timeLabels = hours.map(idx => fmtHour(d.hourly.time[idx]));
+
+  const { path, pts, minT, maxT } = buildChartPath(temps, 358, 148, 20, 20);
+  const range = maxT - minT || 1;
+
+  // Find current hour dot position
+  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
+  const relIdx = Math.max(0, nowHourIdx - startIdx);
+  const nowFrac = Math.min(1, relIdx / ((7 - 1) * step));
+  const liveX = 20 + nowFrac * (358 - 40);
+  const nowTemp = cvtTemp(d.current.temperature_2m);
+  const liveY = 148 - 20 - ((nowTemp - minT) / range) * (148 - 40);
+
+  // Sunrise / sunset
+  const sr = new Date(d.daily.sunrise[0]);
+  const ss = new Date(d.daily.sunset[0]);
+  const dayStart = new Date(today + 'T00:00');
+  const dayEnd = new Date(today + 'T23:59');
+  const xFrac = (t) => 20 + ((t - dayStart) / (dayEnd - dayStart)) * (358 - 40);
+  const srX = Math.max(20, Math.min(338, xFrac(sr)));
+  const ssX = Math.max(20, Math.min(338, xFrac(ss)));
+
+  svg.innerHTML = `
+    <line x1="6" y1="148" x2="352" y2="148" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
+    <!-- sunrise/sunset guides -->
+    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="3,4"/>
+    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.5">${fmtTime(d.daily.sunrise[0])}</text>
+    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="3,4"/>
+    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.5">${fmtTime(d.daily.sunset[0])}</text>
+    <!-- curve -->
+    <path d="${path}" fill="none" stroke="#1a1200" stroke-width="2.2" stroke-opacity="0.75" stroke-linecap="round"/>
+    <!-- temp labels above each point -->
+    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="${i===3?'0.95':'0.6'}">${temps[i]}°</text>`).join('')}
+    <!-- live dot -->
+    <circle cx="${liveX}" cy="${liveY}" r="10" fill="#1a1200" opacity="0.08"/>
+    <circle cx="${liveX}" cy="${liveY}" r="5" fill="#1a1200" opacity="0.85"/>
+  `;
+
+  // Time axis labels
+  timeAxis.innerHTML = timeLabels.map(l => `<span class="time-tick">${l}</span>`).join('');
+}
+
+// ─── Render Forecast List ─────────────────────────────────────────────────
 function renderForecastList() {
-  if(!globalWeatherData) return;
-  const data = globalWeatherData;
+  const d = globalWeatherData;
   const container = document.getElementById('forecast-container');
-  container.innerHTML = ''; 
-  const daysShort = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
-  
-  // Render next 5 days
-  for(let i = 1; i <= 5; i++) {
-    const fDate = new Date(data.daily.time[i]);
+  container.innerHTML = '';
+  const daysShort = ['SU','MO','TU','WE','TH','FR','SA'];
+
+  for (let i = 1; i <= 5; i++) {
+    const fDate = new Date(d.daily.time[i]);
     const row = document.createElement('div');
     row.className = 'forecast-row';
-    // Add click event for interactiveness
-    row.onclick = () => renderDay(i);
-    
+    row.dataset.dayIdx = i;
+
     row.innerHTML = `
-      <div class="forecast-day-header">
-        <div class="forecast-dot">${i === 1 ? 'TM' : daysShort[fDate.getDay()]}</div>
-        <div class="forecast-date">${fDate.toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: '2-digit'})}</div>
+      <div class="forecast-row-header">
+        <div class="forecast-day-header">
+          <div class="forecast-dot">${i === 1 ? 'TM' : daysShort[fDate.getDay()]}</div>
+          <div class="forecast-date">${fDate.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'2-digit'})}</div>
+        </div>
+        <div class="forecast-condition">${cvtTemp(d.daily.temperature_2m_max[i])}° ${wmoLabel(d.daily.weather_code[i])}</div>
+        <div class="forecast-sub">${cvtTemp(d.daily.temperature_2m_min[i])}° Low</div>
       </div>
-      <div class="forecast-condition">${Math.round(data.daily.temperature_2m_max[i])}° ${wmoLabel(data.daily.weather_code[i])}</div>
-      <div class="forecast-sub">${Math.round(data.daily.temperature_2m_min[i])}° Low</div>
+      <div class="forecast-expand">
+        <div class="mini-chart-wrap">
+          <svg class="mini-chart-svg" viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="mini-time-axis"></div>
+        </div>
+      </div>
     `;
+
+    row.addEventListener('click', () => toggleForecastRow(row, i));
     container.appendChild(row);
   }
 }
 
-// GPS Location
-document.getElementById('btn-gps').addEventListener('click', () => {
-  document.getElementById('display-city').textContent = "Locating...";
-  if(navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      async pos => {
-        const loc = await revGeo(pos.coords.latitude, pos.coords.longitude);
-        fetchWeather(pos.coords.latitude, pos.coords.longitude, loc);
-      },
-      () => {
-        alert("Location access denied. Please use the '+' icon to search manually.");
-        document.getElementById('display-city').textContent = "Weather";
-      }
-    );
+// ─── Toggle Expand/Collapse Forecast Row ──────────────────────────────────
+function toggleForecastRow(row, dayIdx) {
+  const isOpen = row.classList.contains('expanded');
+
+  // Close any open row
+  document.querySelectorAll('.forecast-row.expanded').forEach(r => {
+    r.classList.remove('expanded');
+  });
+
+  if (!isOpen) {
+    row.classList.add('expanded');
+    expandedRow = dayIdx - 1;
+    renderMiniChart(row, dayIdx);
   } else {
-    alert("Geolocation is not supported by your browser.");
+    expandedRow = null;
   }
+}
+
+// ─── Render Mini Chart inside a forecast row ──────────────────────────────
+function renderMiniChart(row, dayIdx) {
+  const d = globalWeatherData;
+  const svg = row.querySelector('.mini-chart-svg');
+  const axis = row.querySelector('.mini-time-axis');
+  const today = d.daily.time[dayIdx];
+  const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
+
+  const step = 3;
+  const hours = [];
+  for (let i = 0; i < 7; i++) hours.push(startIdx + i * step);
+
+  const temps = hours.map(idx => cvtTemp(d.hourly.temperature_2m[idx]));
+  const timeLabels = hours.map(idx => fmtHour(d.hourly.time[idx]));
+
+  const { path, pts } = buildChartPath(temps, 320, 82, 16, 14);
+
+  svg.innerHTML = `
+    <line x1="4" y1="82" x2="316" y2="82" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
+    <path d="${path}" fill="none" stroke="#1a1200" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
+    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1]-6}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.65">${temps[i]}°</text>`).join('')}
+  `;
+  axis.innerHTML = timeLabels.map(l => `<span class="mini-time-tick">${l}</span>`).join('');
+}
+
+// ─── GPS Location ─────────────────────────────────────────────────────────
+document.getElementById('btn-gps').addEventListener('click', () => {
+  document.getElementById('display-city').textContent = 'Locating...';
+  if (!navigator.geolocation) {
+    showToast('🌐', 'Not Supported', 'Geolocation is not supported by your browser.', 'Search', openSearch);
+    document.getElementById('display-city').textContent = 'Weather';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const loc = await revGeo(pos.coords.latitude, pos.coords.longitude);
+      fetchWeather(pos.coords.latitude, pos.coords.longitude, loc);
+    },
+    (err) => {
+      document.getElementById('display-city').textContent = 'Weather';
+      if (err.code === 1) {
+        // Permission denied — show in-app toast instead of browser alert
+        showToast('Location Denied', 'Search city manually.', openSearch);
+      } else {
+        showToast('⚠️', 'Location Unavailable', 'Could not get your position. Try searching.', 'Search', openSearch);
+      }
+    },
+    { timeout: 10000, maximumAge: 60000 }
+  );
 });
 
-// Init
+// ─── Init ─────────────────────────────────────────────────────────────────
 window.onload = () => document.getElementById('btn-gps').click();
 </script>
 </body>
