@@ -150,10 +150,16 @@
   /* ─── Search Overlay ─── */
   .search-overlay {
     position: fixed; inset: 0; background: var(--bg); z-index: 1000;
-    padding: 52px 24px 24px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 52px 24px 24px;
     display: flex; flex-direction: column; gap: 16px;
+    opacity: 0; pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
   }
-  .search-overlay.active { transform: translateY(0); }
+  .search-overlay.active {
+    opacity: 1; pointer-events: auto;
+    transform: translateY(0);
+  }
   .search-header { display: flex; gap: 12px; align-items: center; }
   .search-input {
     flex: 1; padding: 14px 16px; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.2);
@@ -168,6 +174,16 @@
   .search-item:hover { background: rgba(0,0,0,0.12); }
   .search-city { font-weight: 800; font-size: 18px; }
   .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
+
+  /* ─── Startup location status line ─── */
+  .location-status {
+    display: none; align-items: center; gap: 8px;
+    padding: 0 24px; margin-top: 10px;
+    font-size: 12px; font-weight: 600; color: var(--text-muted);
+    animation: fadeUp 0.4s ease both;
+  }
+  .location-status.visible { display: flex; }
+  .location-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
 
   /* ─── Header ─── */
   .header {
@@ -360,6 +376,12 @@
       </div>
     </div>
     <div class="live-badge hidden" id="live-badge">LIVE</div>
+  </div>
+
+  <!-- Location status line (shown on denied/error, hidden once data loads) -->
+  <div class="location-status" id="location-status">
+    <div class="location-status-dot"></div>
+    <span id="location-status-text">Unable to fetch current location </span>
   </div>
 
   <!-- Hero: Today only -->
@@ -657,8 +679,8 @@ async function fetchWeather(lat, lon, cityName) {
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lon,
-    current: 'temperature_2m,weather_code',
-    hourly: 'temperature_2m',
+    current: 'temperature_2m,weather_code,apparent_temperature',
+    hourly: 'temperature_2m,weather_code',
     daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset',
     timezone: 'auto',
     forecast_days: 7
@@ -666,6 +688,7 @@ async function fetchWeather(lat, lon, cityName) {
   try {
     globalWeatherData = await jfetch(`${WX_URL}?${params}`);
     expandedRow = null;
+    hideLocationStatus();
     renderTodayHero();
     renderTodayChart();
     renderForecastList();
@@ -680,10 +703,17 @@ function renderTodayHero() {
   document.getElementById('temp-current').textContent = cvtTemp(d.current.temperature_2m);
   document.getElementById('temp-unit').textContent = '°';
   document.getElementById('temp-low').textContent = cvtTemp(d.daily.temperature_2m_min[0]) + '°';
-  document.getElementById('condition').textContent = wmoLabel(d.current.weather_code);
   document.getElementById('live-badge').classList.remove('hidden');
-  // Update weather icon dynamically
-  document.getElementById('weather-icon').innerHTML = wmoIcon(d.current.weather_code);
+
+  // Use hourly weather_code at current hour — more accurate than daily current
+  const now = new Date();
+  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
+  const currentCode = (nowHourIdx >= 0 && d.hourly.weather_code)
+    ? d.hourly.weather_code[nowHourIdx]
+    : d.current.weather_code;
+
+  document.getElementById('condition').textContent = wmoLabel(currentCode);
+  document.getElementById('weather-icon').innerHTML = wmoIcon(currentCode);
 }
 
 // ─── Build SVG Chart Path (shared by today + mini) ────────────────────────
@@ -714,12 +744,11 @@ function renderTodayChart() {
   const svg = document.getElementById('today-chart-svg');
   const timeAxis = document.getElementById('time-axis');
 
-  // Find hours for today (indices 0–23 of today)
   const today = d.daily.time[0];
   const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
   const now = new Date();
 
-  // Pick 7 evenly spread hours across the day
+  // 7 points: hours 0,3,6,9,12,15,18 of the day
   const step = 3;
   const hours = [];
   for (let i = 0; i < 7; i++) hours.push(startIdx + i * step);
@@ -730,40 +759,43 @@ function renderTodayChart() {
   const { path, pts, minT, maxT } = buildChartPath(temps, 358, 148, 20, 20);
   const range = maxT - minT || 1;
 
-  // Find current hour dot position
-  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
-  const relIdx = Math.max(0, nowHourIdx - startIdx);
-  const nowFrac = Math.min(1, relIdx / ((7 - 1) * step));
+  // ── Live dot: map current time precisely to chart x-axis ──
+  // Chart spans from chartHour[0] to chartHour[6] (0h to 18h of today by default)
+  const chartStartTime = new Date(d.hourly.time[hours[0]]);
+  const chartEndTime   = new Date(d.hourly.time[hours[hours.length - 1]]);
+  const totalMs = chartEndTime - chartStartTime;
+  const elapsedMs = Math.max(0, Math.min(totalMs, now - chartStartTime));
+  const nowFrac = elapsedMs / totalMs;                    // 0–1 across chart width
   const liveX = 20 + nowFrac * (358 - 40);
-  const nowTemp = cvtTemp(d.current.temperature_2m);
+
+  // Y: interpolate temperature at current time between surrounding hourly points
+  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
+  const clampedIdx = Math.max(hours[0], Math.min(hours[hours.length-1], nowHourIdx));
+  const nowTemp = cvtTemp(d.hourly.temperature_2m[clampedIdx]);
   const liveY = 148 - 20 - ((nowTemp - minT) / range) * (148 - 40);
 
-  // Sunrise / sunset
+  // Sunrise / sunset lines positioned by time-of-day fraction
   const sr = new Date(d.daily.sunrise[0]);
   const ss = new Date(d.daily.sunset[0]);
-  const dayStart = new Date(today + 'T00:00');
-  const dayEnd = new Date(today + 'T23:59');
-  const xFrac = (t) => 20 + ((t - dayStart) / (dayEnd - dayStart)) * (358 - 40);
-  const srX = Math.max(20, Math.min(338, xFrac(sr)));
-  const ssX = Math.max(20, Math.min(338, xFrac(ss)));
+  const xByTime = (t) => {
+    const frac = Math.max(0, Math.min(1, (t - chartStartTime) / totalMs));
+    return 20 + frac * (358 - 40);
+  };
+  const srX = xByTime(sr);
+  const ssX = xByTime(ss);
 
   svg.innerHTML = `
     <line x1="6" y1="148" x2="352" y2="148" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
-    <!-- sunrise/sunset guides -->
-    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="3,4"/>
-    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.5">${fmtTime(d.daily.sunrise[0])}</text>
-    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.25" stroke-dasharray="3,4"/>
-    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.5">${fmtTime(d.daily.sunset[0])}</text>
-    <!-- curve -->
+    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.45">${fmtTime(d.daily.sunrise[0])}</text>
+    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.45">${fmtTime(d.daily.sunset[0])}</text>
     <path d="${path}" fill="none" stroke="#1a1200" stroke-width="2.2" stroke-opacity="0.75" stroke-linecap="round"/>
-    <!-- temp labels above each point -->
     ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="${i===3?'0.95':'0.6'}">${temps[i]}°</text>`).join('')}
-    <!-- live dot -->
     <circle cx="${liveX}" cy="${liveY}" r="10" fill="#1a1200" opacity="0.08"/>
     <circle cx="${liveX}" cy="${liveY}" r="5" fill="#1a1200" opacity="0.85"/>
   `;
 
-  // Time axis labels
   timeAxis.innerHTML = timeLabels.map(l => `<span class="time-tick">${l}</span>`).join('');
 }
 
@@ -845,29 +877,44 @@ function renderMiniChart(row, dayIdx) {
   axis.innerHTML = timeLabels.map(l => `<span class="mini-time-tick">${l}</span>`).join('');
 }
 
+// ─── Location Status (inline, no toast on startup) ────────────────────────
+function showLocationStatus(msg) {
+  const el = document.getElementById('location-status');
+  document.getElementById('location-status-text').textContent = msg;
+  el.classList.add('visible');
+}
+function hideLocationStatus() {
+  document.getElementById('location-status').classList.remove('visible');
+}
+
 // ─── GPS Location ─────────────────────────────────────────────────────────
+let isFirstLoad = true;
 document.getElementById('btn-gps').addEventListener('click', () => {
   document.getElementById('display-city').textContent = 'Locating...';
+  hideLocationStatus();
   if (!navigator.geolocation) {
-    showToast('🌐', 'Not Supported', 'Geolocation is not supported by your browser.', 'Search', openSearch);
     document.getElementById('display-city').textContent = 'Weather';
+    showLocationStatus('Location not supported — search a city to get started');
+    if (isFirstLoad) { isFirstLoad = false; openSearch(); }
     return;
   }
   navigator.geolocation.getCurrentPosition(
     async pos => {
+      isFirstLoad = false;
       const loc = await revGeo(pos.coords.latitude, pos.coords.longitude);
       fetchWeather(pos.coords.latitude, pos.coords.longitude, loc);
     },
     (err) => {
       document.getElementById('display-city').textContent = 'Weather';
       if (err.code === 1) {
-        // Permission denied — show in-app toast instead of browser alert
-        showToast('Location Denied', 'Search city manually.', openSearch);
+        showLocationStatus('Unable to fetch current location — search a city to get started');
+        if (isFirstLoad) { isFirstLoad = false; openSearch(); }
       } else {
-        showToast('⚠️', 'Location Unavailable', 'Could not get your position. Try searching.', 'Search', openSearch);
+        showLocationStatus('Location unavailable — search a city to get started');
+        if (isFirstLoad) { isFirstLoad = false; openSearch(); }
       }
     },
-    { timeout: 10000, maximumAge: 60000 }
+    { timeout: 8000, maximumAge: 60000 }
   );
 });
 
