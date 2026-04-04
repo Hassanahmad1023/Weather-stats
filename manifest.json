@@ -1,0 +1,21 @@
+{
+  "name": "Weather",
+  "short_name": "Weather",
+  "description": "Minimal precision weather with GPS and search.",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F5C842",
+  "theme_color": "#1a1200",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/device/brightness_low/materialicons/48dp/2x/baseline_brightness_low_black_48dp.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/google/material-design-icons/master/png/device/brightness_low/materialicons/48dp/2x/baseline_brightness_low_black_48dp.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
