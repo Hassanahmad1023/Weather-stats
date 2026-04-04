@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIMBUS Weather</title>
+<title>Weather</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -12,6 +13,7 @@
     --text: #1a1200;
     --text-muted: #6b5200;
     --bg: #F5C842;
+    --surface: #ffffff;
     --divider: rgba(0,0,0,0.10);
   }
 
@@ -20,6 +22,7 @@
     background: var(--bg);
     font-family: 'Figtree', sans-serif;
     color: var(--text);
+    overflow-x: hidden;
   }
 
   .app {
@@ -27,83 +30,99 @@
     margin: 0 auto;
     min-height: 100vh;
     padding: 52px 0 40px;
+    position: relative;
   }
+
+  /* Sidebar */
+  .sidebar-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+  }
+  .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+  
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 80vw;
+    background: var(--surface); z-index: 999;
+    transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+  .sidebar.active { transform: translateX(0); }
+  
+  .set-header {
+    display: flex; align-items: center; gap: 12px; padding: 24px 20px;
+    font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
+    cursor: pointer; border-bottom: 1px solid var(--divider);
+  }
+  .set-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px; cursor: pointer; border-bottom: 1px solid var(--divider);
+    transition: background 0.2s;
+  }
+  .set-item:hover { background: rgba(0,0,0,0.03); }
+  .set-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .set-sub { font-size: 12px; font-weight: 500; color: rgba(26, 18, 0, 0.6); }
+
+  /* Interactive Search Overlay */
+  .search-overlay {
+    position: fixed; inset: 0; background: var(--bg); z-index: 1000;
+    padding: 52px 24px 24px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .search-overlay.active { transform: translateY(0); }
+  .search-header { display: flex; gap: 12px; align-items: center; }
+  .search-input {
+    flex: 1; padding: 14px 16px; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.2);
+    background: rgba(255,255,255,0.3); color: var(--text); font-size: 16px;
+    font-family: inherit; font-weight: 700; outline: none; transition: background 0.2s;
+  }
+  .search-input:focus { background: rgba(255,255,255,0.5); }
+  .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
+  .search-close {
+    font-weight: 800; background: transparent; border: none; cursor: pointer; color: var(--text); font-size: 14px; text-transform: uppercase;
+  }
+  .search-results { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+  .search-item {
+    padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.06); cursor: pointer; transition: background 0.15s;
+  }
+  .search-item:hover { background: rgba(0,0,0,0.12); }
+  .search-city { font-weight: 800; font-size: 18px; }
+  .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
 
   /* Header */
   .header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 0 24px;
-    animation: fadeUp 0.45s ease both;
+    display: flex; align-items: flex-start; justify-content: space-between;
+    padding: 0 24px; animation: fadeUp 0.45s ease both;
   }
-  .date-label {
-    font-size: 11.5px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  .city-name {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    line-height: 1.1;
-  }
-  .header-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 18px;
-  }
+  .header-left { display: flex; align-items: flex-start; gap: 16px; }
+  .menu-btn { margin-top: 4px; }
+  .city-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+  
+  .header-actions { display: flex; gap: 6px; margin-top: 8px; }
   .icon-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(0,0,0,0.10);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background 0.15s;
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(0,0,0,0.10); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: background 0.15s; flex-shrink: 0;
   }
   .icon-btn:hover { background: rgba(0,0,0,0.18); }
+  
   .live-badge {
-    background: var(--text);
-    color: var(--bg);
-    font-size: 10px;
-    font-weight: 800;
-    padding: 5px 10px;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
+    background: var(--text); color: var(--bg); font-size: 10px; font-weight: 800;
+    padding: 5px 10px; border-radius: 20px; letter-spacing: 0.5px; margin-top: 4px; transition: opacity 0.3s;
   }
 
   /* Temp */
-  .temp-section {
-    padding: 20px 24px 0;
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    animation: fadeUp 0.5s ease 0.1s both;
-  }
+  .temp-section { padding: 24px 24px 0; display: flex; align-items: flex-start; gap: 14px; animation: fadeUp 0.5s ease 0.1s both; }
   .sun-icon { margin-top: 10px; flex-shrink: 0; }
   .temp-row { display: flex; align-items: baseline; line-height: 1; }
-  .temp-current {
-    font-size: 76px;
-    font-weight: 900;
-    letter-spacing: -5px;
-    line-height: 1;
-  }
+  .temp-current { font-size: 76px; font-weight: 900; letter-spacing: -5px; line-height: 1; transition: opacity 0.3s; }
   .temp-unit { font-size: 30px; font-weight: 700; letter-spacing: -1px; margin-top: 8px; }
   .temp-divider { font-size: 22px; font-weight: 400; color: var(--text-muted); margin: 0 5px; margin-top: 16px; }
-  .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; }
-  .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; }
+  .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; transition: opacity 0.3s; }
+  .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; }
 
   /* Chart */
-  .chart-section {
-    padding: 6px 16px 0;
-    animation: fadeUp 0.5s ease 0.25s both;
-  }
+  .chart-section { padding: 6px 16px 0; animation: fadeUp 0.5s ease 0.25s both; }
   .chart-svg { width: 100%; height: 180px; overflow: visible; }
   .time-axis { display: flex; justify-content: space-between; padding: 2px 20px 0; }
   .time-tick { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
@@ -114,160 +133,357 @@
   /* Forecast */
   .forecast-section { padding: 4px 0; animation: fadeUp 0.5s ease 0.4s both; }
   .forecast-row {
-    padding: 11px 24px;
-    border-bottom: 1px solid var(--divider);
+    padding: 11px 24px; border-bottom: 1px solid var(--divider);
     display: flex; flex-direction: column; gap: 2px;
     cursor: pointer; transition: background 0.15s;
   }
-  .forecast-row:hover { background: rgba(0,0,0,0.04); }
+  .forecast-row:hover, .forecast-row.active { background: rgba(0,0,0,0.06); }
   .forecast-row:last-child { border-bottom: none; }
   .forecast-day-header { display: flex; align-items: center; gap: 8px; }
   .forecast-dot {
-    width: 26px; height: 26px; border-radius: 6px;
-    background: rgba(0,0,0,0.10);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 800;
+    width: 26px; height: 26px; border-radius: 6px; background: rgba(0,0,0,0.10);
+    display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; transition: background 0.2s, color 0.2s;
   }
+  .forecast-row.active .forecast-dot { background: var(--text); color: var(--bg); }
   .forecast-date { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .forecast-condition { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; padding-left: 34px; }
   .forecast-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); padding-left: 34px; }
 
-  @keyframes pulse-glow {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.75; transform: scale(1.06); }
-  }
+  @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.06); } }
   .sun-anim { animation: pulse-glow 3s ease-in-out infinite; transform-origin: center; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 </head>
 <body>
-<div class="app">
 
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+<div class="sidebar" id="sidebar">
+  <div class="set-header" onclick="toggleSidebar()">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    SETTINGS
+  </div>
+  <div class="set-item">
+    <div><div class="set-title">Temperature</div><div class="set-sub">Celsius - °C</div></div>
+  </div>
+  <div class="set-item">
+    <div><div class="set-title">Wind Speed</div><div class="set-sub">Kilometers per hour - km/h</div></div>
+  </div>
+  <div class="set-item" onclick="document.getElementById('btn-gps').click(); toggleSidebar();">
+    <div><div class="set-title">Update Location</div><div class="set-sub">Fetch current GPS data</div></div>
+  </div>
+</div>
+
+<div class="search-overlay" id="search-overlay">
+  <div class="search-header">
+    <input type="text" id="search-input" class="search-input" placeholder="Search City..." autocomplete="off">
+    <button class="search-close" onclick="closeSearch()">Cancel</button>
+  </div>
+  <div class="search-results" id="search-results">
+    </div>
+</div>
+
+<div class="app">
   <div class="header">
-    <div>
-      <div class="date-label">Saturday, Apr 04</div>
-      <div class="city-name">Islamabad</div>
-      <div class="header-actions">
-        <div class="icon-btn">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <path d="M7 1V13M1 7H13" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="icon-btn">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="1" y="3" width="12" height="10" rx="2" stroke="#1a1200" stroke-width="1.8"/>
-            <path d="M1 6H13" stroke="#1a1200" stroke-width="1.8"/>
-            <path d="M4 1V4M10 1V4" stroke="#1a1200" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
+    <div class="header-left">
+      <div class="icon-btn menu-btn" onclick="toggleSidebar()" aria-label="Menu">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </div>
+      <div>
+        <div class="city-name" id="display-city">Locating...</div>
+        <div class="header-actions">
+          <div class="icon-btn" id="btn-gps" title="Use GPS Location">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          </div>
+          <div class="icon-btn" onclick="openSearch()" title="Add City">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
         </div>
       </div>
     </div>
-    <div class="live-badge">LIVE</div>
+    <div class="live-badge" id="live-badge">LIVE</div>
   </div>
 
-  <div class="temp-section">
+  <div class="temp-section" id="hero-section">
     <div class="sun-icon">
       <svg width="34" height="34" viewBox="0 0 32 32" fill="none" class="sun-anim">
         <circle cx="16" cy="16" r="7" fill="#1a1200" opacity="0.85"/>
-        <line x1="16" y1="1"  x2="16" y2="5"  stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="16" y1="1" x2="16" y2="5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
         <line x1="16" y1="27" x2="16" y2="31" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="1"  y1="16" x2="5"  y2="16" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="1" y1="16" x2="5" y2="16" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
         <line x1="27" y1="16" x2="31" y2="16" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="5.5"  y1="5.5"  x2="8.3"  y2="8.3"  stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="5.5" y1="5.5" x2="8.3" y2="8.3" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
         <line x1="23.7" y1="23.7" x2="26.5" y2="26.5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="26.5" y1="5.5"  x2="23.7" y2="8.3"  stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-        <line x1="8.3"  y1="23.7" x2="5.5"  y2="26.5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="26.5" y1="5.5" x2="23.7" y2="8.3" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+        <line x1="8.3" y1="23.7" x2="5.5" y2="26.5" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
       </svg>
     </div>
     <div>
       <div class="temp-row">
-        <span class="temp-current">22</span>
+        <span class="temp-current">--</span>
         <span class="temp-unit">°</span>
         <span class="temp-divider">/</span>
-        <span class="temp-low">14°</span>
+        <span class="temp-low">--°</span>
       </div>
-      <div class="condition">Sunny</div>
+      <div class="condition">--</div>
     </div>
   </div>
 
   <div class="chart-section">
     <svg class="chart-svg" viewBox="0 0 358 175" xmlns="http://www.w3.org/2000/svg">
-      <path
+      <path id="chart-path"
         d="M 10 135 C 25 138, 55 140, 70 138 C 90 136, 100 120, 120 105 C 140 88, 155 55, 179 48 C 203 42, 220 58, 238 72 C 255 85, 268 112, 285 128 C 300 140, 330 142, 348 140"
         fill="none" stroke="#1a1200" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
 
-      <text x="10"  y="122" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">16°</text>
-      <text x="70"  y="126" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">14°</text>
-      <text x="120" y="93"  text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">18°</text>
-      <text x="155" y="42"  text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">22°</text>
-      <text x="179" y="35"  text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.95">27°</text>
-      <text x="238" y="58"  text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">25°</text>
-      <text x="285" y="115" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">20°</text>
+      <text class="chart-temp-text" x="10" y="122" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
+      <text class="chart-temp-text" x="70" y="126" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
+      <text class="chart-temp-text" x="120" y="93" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
+      <text class="chart-temp-text" x="155" y="42" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
+      <text class="chart-temp-text" x="179" y="35" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.95">--°</text>
+      <text class="chart-temp-text" x="238" y="58" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
+      <text class="chart-temp-text" x="285" y="115" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="0.65">--°</text>
 
       <line x1="109" y1="38" x2="109" y2="155" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3,4"/>
-      <text x="109" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">06:24</text>
+      <text id="sunrise-time" x="109" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">--:--</text>
 
       <line x1="284" y1="38" x2="284" y2="155" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.3" stroke-dasharray="3,4"/>
-      <text x="284" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">18:15</text>
+      <text id="sunset-time" x="284" y="166" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.55">--:--</text>
 
       <line x1="6" y1="150" x2="352" y2="150" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
-
-      <circle cx="167" cy="51" r="5"  fill="#1a1200" opacity="0.85"/>
-      <circle cx="167" cy="51" r="10" fill="#1a1200" opacity="0.10"/>
+      
+      <circle id="live-dot" cx="167" cy="51" r="5" fill="#1a1200" opacity="0.85"/>
+      <circle id="live-pulse" cx="167" cy="51" r="10" fill="#1a1200" opacity="0.10"/>
     </svg>
 
-    <div class="time-axis">
-      <span class="time-tick">12</span>
-      <span class="time-tick">3</span>
-      <span class="time-tick">6</span>
-      <span class="time-tick">9</span>
-      <span class="time-tick">12</span>
-      <span class="time-tick">3</span>
-      <span class="time-tick">6</span>
+    <div class="time-axis" id="time-axis">
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
+      <span class="time-tick">--</span>
     </div>
   </div>
 
   <div class="divider"></div>
-
-  <div class="forecast-section">
-    <div class="forecast-row">
-      <div class="forecast-day-header">
-        <div class="forecast-dot">SU</div>
-        <div class="forecast-date">Sunday, Apr 05</div>
-      </div>
-      <div class="forecast-condition">25° Sunny & Windy</div>
-      <div class="forecast-sub">12° Clear Night</div>
-    </div>
-    <div class="forecast-row">
-      <div class="forecast-day-header">
-        <div class="forecast-dot">MO</div>
-        <div class="forecast-date">Monday, Apr 06</div>
-      </div>
-      <div class="forecast-condition">24° Mostly Sunny</div>
-      <div class="forecast-sub">13° Clear Night</div>
-    </div>
-    <div class="forecast-row">
-      <div class="forecast-day-header">
-        <div class="forecast-dot">TU</div>
-        <div class="forecast-date">Tuesday, Apr 07</div>
-      </div>
-      <div class="forecast-condition">21° Partly Cloudy</div>
-      <div class="forecast-sub">11° Cloudy Night</div>
-    </div>
-    <div class="forecast-row">
-      <div class="forecast-day-header">
-        <div class="forecast-dot">WE</div>
-        <div class="forecast-date">Wednesday, Apr 08</div>
-      </div>
-      <div class="forecast-condition">19° Chance of Rain</div>
-      <div class="forecast-sub">10° Light Showers</div>
-    </div>
-  </div>
-
+  <div class="forecast-section" id="forecast-container"></div>
 </div>
+
+<script>
+'use strict';
+
+const WX_URL = 'https://api.open-meteo.com/v1/forecast';
+const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const NOM_URL = 'https://nominatim.openstreetmap.org/reverse';
+let globalWeatherData = null;
+
+// Sidebar Logic
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('active');
+  document.getElementById('sidebar-overlay').classList.toggle('active');
+}
+
+// Search Logic
+function openSearch() {
+  document.getElementById('search-overlay').classList.add('active');
+  document.getElementById('search-input').focus();
+}
+function closeSearch() {
+  document.getElementById('search-overlay').classList.remove('active');
+  document.getElementById('search-input').value = '';
+  document.getElementById('search-results').innerHTML = '';
+}
+
+let searchTimeout;
+document.getElementById('search-input').addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  const query = e.target.value.trim();
+  if(query.length < 2) {
+    document.getElementById('search-results').innerHTML = '';
+    return;
+  }
+  
+  searchTimeout = setTimeout(async () => {
+    try {
+      const d = await jfetch(`${GEO_URL}?name=${encodeURIComponent(query)}&count=5&format=json`);
+      const res = d.results || [];
+      const html = res.map(r => `
+        <div class="search-item" onclick="selectCity(${r.latitude}, ${r.longitude}, '${r.name}')">
+          <div class="search-city">${r.name}</div>
+          <div class="search-country">${r.admin1 ? r.admin1 + ', ' : ''}${r.country || ''}</div>
+        </div>
+      `).join('');
+      document.getElementById('search-results').innerHTML = html || '<div class="search-item">No results found</div>';
+    } catch(err) {
+      document.getElementById('search-results').innerHTML = '<div class="search-item">Error fetching data</div>';
+    }
+  }, 300);
+});
+
+function selectCity(lat, lon, name) {
+  closeSearch();
+  fetchWeather(lat, lon, name);
+}
+
+// Weather Codes Translator
+function wmoLabel(code){
+  if(code===0) return 'Sunny';
+  if(code===1) return 'Mostly Sunny';
+  if(code===2) return 'Partly Cloudy';
+  if(code===3) return 'Overcast';
+  if(code<=48) return 'Fog';
+  if(code<=57) return 'Drizzle';
+  if(code<=67) return 'Rain';
+  if(code<=77) return 'Snow';
+  if(code<=82) return 'Showers';
+  if(code<=86) return 'Snow Showers';
+  return 'Storms';
+}
+
+async function jfetch(url) {
+  const res = await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+async function revGeo(lat, lon) {
+  try {
+    const d = await jfetch(`${NOM_URL}?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+    const a = d.address || {};
+    return a.city || a.town || a.village || 'Unknown';
+  } catch { return 'Local Area'; }
+}
+
+async function fetchWeather(lat, lon, cityName) {
+  document.getElementById('display-city').textContent = cityName;
+  const params = new URLSearchParams({
+    latitude: lat,
+    longitude: lon,
+    current: 'temperature_2m,weather_code',
+    hourly: 'temperature_2m',
+    daily: 'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset',
+    timezone: 'auto',
+    forecast_days: 7
+  });
+
+  try {
+    globalWeatherData = await jfetch(`${WX_URL}?${params}`);
+    renderDay(0); // Render Today by default
+    renderForecastList();
+  } catch (e) {
+    alert("Failed to fetch weather data.");
+  }
+}
+
+// Interactive rendering of selected day
+function renderDay(dayIndex) {
+  if(!globalWeatherData) return;
+  const data = globalWeatherData;
+  
+  // Highlight active row in forecast list
+  document.querySelectorAll('.forecast-row').forEach((row, idx) => {
+    row.classList.toggle('active', idx === dayIndex - 1);
+  });
+
+  const isToday = dayIndex === 0;
+  
+  // Header / Hero Update
+  if (isToday) {
+    document.querySelector('.temp-current').textContent = Math.round(data.current.temperature_2m);
+    document.querySelector('.condition').textContent = wmoLabel(data.current.weather_code);
+    document.getElementById('live-badge').style.opacity = '1';
+    document.getElementById('live-dot').style.display = 'block';
+    document.getElementById('live-pulse').style.display = 'block';
+  } else {
+    document.querySelector('.temp-current').textContent = Math.round(data.daily.temperature_2m_max[dayIndex]);
+    document.querySelector('.condition').textContent = wmoLabel(data.daily.weather_code[dayIndex]);
+    document.getElementById('live-badge').style.opacity = '0';
+    document.getElementById('live-dot').style.display = 'none';
+    document.getElementById('live-pulse').style.display = 'none';
+  }
+  document.querySelector('.temp-low').textContent = Math.round(data.daily.temperature_2m_min[dayIndex]) + '°';
+
+  // Chart Update
+  const sr = new Date(data.daily.sunrise[dayIndex]);
+  const ss = new Date(data.daily.sunset[dayIndex]);
+  document.getElementById('sunrise-time').textContent = `${String(sr.getHours()).padStart(2,'0')}:${String(sr.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('sunset-time').textContent = `${String(ss.getHours()).padStart(2,'0')}:${String(ss.getMinutes()).padStart(2,'0')}`;
+
+  const timeTicks = document.querySelectorAll('.time-tick');
+  const tempTexts = document.querySelectorAll('.chart-temp-text');
+  
+  // Find where hourly data starts for the selected day
+  const targetDateStr = data.daily.time[dayIndex];
+  let hourStartIndex = data.hourly.time.findIndex(t => t.startsWith(targetDateStr));
+  
+  // Default to 6am for chart start on future days, or current hour for today
+  if (isToday) {
+     const now = new Date();
+     let currentIdx = data.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
+     hourStartIndex = currentIdx > 0 ? currentIdx : hourStartIndex;
+  } else {
+     hourStartIndex += 6; 
+  }
+
+  for(let i = 0; i < 7; i++) {
+    const hrIndex = hourStartIndex + (i * 3); 
+    if(hrIndex < data.hourly.time.length) {
+      const hrDate = new Date(data.hourly.time[hrIndex]);
+      let h12 = hrDate.getHours() % 12 || 12;
+      timeTicks[i].textContent = h12;
+      tempTexts[i].textContent = Math.round(data.hourly.temperature_2m[hrIndex]) + '°';
+    }
+  }
+}
+
+function renderForecastList() {
+  if(!globalWeatherData) return;
+  const data = globalWeatherData;
+  const container = document.getElementById('forecast-container');
+  container.innerHTML = ''; 
+  const daysShort = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+  
+  // Render next 5 days
+  for(let i = 1; i <= 5; i++) {
+    const fDate = new Date(data.daily.time[i]);
+    const row = document.createElement('div');
+    row.className = 'forecast-row';
+    // Add click event for interactiveness
+    row.onclick = () => renderDay(i);
+    
+    row.innerHTML = `
+      <div class="forecast-day-header">
+        <div class="forecast-dot">${i === 1 ? 'TM' : daysShort[fDate.getDay()]}</div>
+        <div class="forecast-date">${fDate.toLocaleDateString('en-US', {weekday: 'long', month: 'short', day: '2-digit'})}</div>
+      </div>
+      <div class="forecast-condition">${Math.round(data.daily.temperature_2m_max[i])}° ${wmoLabel(data.daily.weather_code[i])}</div>
+      <div class="forecast-sub">${Math.round(data.daily.temperature_2m_min[i])}° Low</div>
+    `;
+    container.appendChild(row);
+  }
+}
+
+// GPS Location
+document.getElementById('btn-gps').addEventListener('click', () => {
+  document.getElementById('display-city').textContent = "Locating...";
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      async pos => {
+        const loc = await revGeo(pos.coords.latitude, pos.coords.longitude);
+        fetchWeather(pos.coords.latitude, pos.coords.longitude, loc);
+      },
+      () => {
+        alert("Location access denied. Please use the '+' icon to search manually.");
+        document.getElementById('display-city').textContent = "Weather";
+      }
+    );
+  } else {
+    alert("Geolocation is not supported by your browser.");
+  }
+});
+
+// Init
+window.onload = () => document.getElementById('btn-gps').click();
+</script>
 </body>
 </html>
