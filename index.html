@@ -9,12 +9,66 @@
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  :root {
+  /* Theme System */
+  :root[data-theme="orange"] {
     --text: #1a1200;
     --text-muted: #6b5200;
     --bg: #F5C842;
+    --bg-secondary: #f7d466;
     --surface: #ffffff;
+    --surface-hover: rgba(0,0,0,0.04);
     --divider: rgba(0,0,0,0.10);
+    --accent: #1a1200;
+    --chart-line: #1a1200;
+    --live-dot: #1a1200;
+    --toast-bg: rgba(26,18,0,0.88);
+    --toast-text: rgba(245,200,66,0.95);
+  }
+
+  :root[data-theme="light"] {
+    --text: #0a0a0a;
+    --text-muted: #6e6e6e;
+    --bg: #ffffff;
+    --bg-secondary: #f7f7f7;
+    --surface: #f0f0f0;
+    --surface-hover: rgba(0,0,0,0.03);
+    --divider: rgba(0,0,0,0.08);
+    --accent: #0a0a0a;
+    --chart-line: #0a0a0a;
+    --live-dot: #ff4444;
+    --toast-bg: rgba(10,10,10,0.88);
+    --toast-text: rgba(255,255,255,0.95);
+  }
+
+  :root[data-theme="dark"] {
+    --text: #ffffff;
+    --text-muted: #999999;
+    --bg: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --surface: #1e1e1e;
+    --surface-hover: rgba(255,255,255,0.06);
+    --divider: rgba(255,255,255,0.12);
+    --accent: #ffffff;
+    --chart-line: #ffffff;
+    --live-dot: #44ff88;
+    --toast-bg: rgba(30,30,30,0.95);
+    --toast-text: rgba(255,255,255,0.95);
+  }
+
+  /* Default theme */
+  :root { 
+    --text: #1a1200;
+    --text-muted: #6b5200;
+    --bg: #F5C842;
+    --bg-secondary: #f7d466;
+    --surface: #ffffff;
+    --surface-hover: rgba(0,0,0,0.04);
+    --divider: rgba(0,0,0,0.10);
+    --accent: #1a1200;
+    --chart-line: #1a1200;
+    --live-dot: #1a1200;
+    --toast-bg: rgba(26,18,0,0.88);
+    --toast-text: rgba(245,200,66,0.95);
   }
 
   html, body {
@@ -23,6 +77,7 @@
     font-family: 'Figtree', sans-serif;
     color: var(--text);
     overflow-x: hidden;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   .app {
@@ -33,16 +88,16 @@
     position: relative;
   }
 
-  /* ─── In-App Toast Notification (slim pill) ─── */
+  /* ─── Toast Notification ─── */
   .toast {
     position: fixed;
     bottom: 28px;
     left: 50%;
     transform: translateX(-50%) translateY(70px);
-    background: rgba(26,18,0,0.88);
+    background: var(--toast-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    color: rgba(245,200,66,0.95);
+    color: var(--toast-text);
     padding: 10px 14px 10px 12px;
     border-radius: 40px;
     font-size: 12px;
@@ -53,7 +108,7 @@
     gap: 8px;
     z-index: 2000;
     opacity: 0;
-    transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1), opacity 0.25s ease;
+    transition: all 0.3s cubic-bezier(0.34,1.4,0.64,1);
     box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     pointer-events: none;
   }
@@ -68,9 +123,9 @@
   .toast-msg { font-size: 11px; font-weight: 500; opacity: 0.7; }
   .toast-action {
     flex-shrink: 0;
-    background: rgba(245,200,66,0.15);
-    color: rgba(245,200,66,0.95);
-    border: 1px solid rgba(245,200,66,0.3);
+    background: var(--toast-text);
+    color: var(--toast-bg);
+    border: 1px solid transparent;
     border-radius: 20px;
     padding: 5px 10px;
     font-size: 10px;
@@ -79,10 +134,11 @@
     cursor: pointer;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    transition: background 0.15s;
+    transition: opacity 0.15s;
     margin-left: 2px;
+    opacity: 0.15;
   }
-  .toast-action:hover { background: rgba(245,200,66,0.25); }
+  .toast-action:hover { opacity: 0.25; }
 
   /* ─── Sidebar ─── */
   .sidebar-overlay {
@@ -94,7 +150,7 @@
   .sidebar {
     position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 80vw;
     background: var(--surface); z-index: 999;
-    transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 4px 0 24px rgba(0,0,0,0.15);
     display: flex; flex-direction: column; overflow-y: auto;
   }
@@ -104,6 +160,7 @@
     display: flex; align-items: center; gap: 12px; padding: 24px 20px;
     font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
     cursor: pointer; border-bottom: 1px solid var(--divider);
+    color: var(--text);
   }
   .set-section-label {
     font-size: 10px; font-weight: 800; text-transform: uppercase;
@@ -117,33 +174,78 @@
     font-size: 13px; font-weight: 700; color: var(--text);
     margin-bottom: 10px;
   }
+  
   /* Toggle pill group */
   .toggle-group {
     display: flex; gap: 6px; flex-wrap: wrap;
   }
   .toggle-btn {
-    padding: 7px 14px; border-radius: 20px; border: 1.5px solid rgba(0,0,0,0.15);
+    padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--divider);
     background: transparent; color: var(--text-muted);
     font-size: 12px; font-weight: 700; font-family: inherit;
     cursor: pointer; transition: all 0.2s ease;
     letter-spacing: 0.3px;
   }
-  .toggle-btn:hover { background: rgba(0,0,0,0.05); }
+  .toggle-btn:hover { background: var(--surface-hover); }
   .toggle-btn.active {
-    background: var(--text); color: var(--bg);
-    border-color: var(--text);
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent);
   }
+
+  /* Theme pills */
+  .theme-group {
+    display: flex; gap: 8px;
+  }
+  .theme-btn {
+    flex: 1;
+    padding: 12px; 
+    border-radius: 12px; 
+    border: 2px solid var(--divider);
+    background: transparent;
+    font-size: 11px; 
+    font-weight: 800; 
+    font-family: inherit;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-muted);
+  }
+  .theme-btn:hover { 
+    border-color: var(--text-muted); 
+    transform: translateY(-1px);
+  }
+  .theme-btn.active {
+    background: var(--accent); 
+    color: var(--bg);
+    border-color: var(--accent);
+    transform: scale(1.02);
+  }
+  .theme-swatch {
+    width: 24px; 
+    height: 24px; 
+    border-radius: 6px;
+    border: 1.5px solid var(--divider);
+  }
+  .theme-btn[data-theme="orange"] .theme-swatch { background: #F5C842; }
+  .theme-btn[data-theme="light"] .theme-swatch { background: #ffffff; }
+  .theme-btn[data-theme="dark"] .theme-swatch { background: #0a0a0a; }
+
   .set-action-item {
     display: flex; align-items: center; gap: 12px;
     padding: 16px 20px; border-bottom: 1px solid var(--divider);
     cursor: pointer; transition: background 0.15s;
   }
-  .set-action-item:hover { background: rgba(0,0,0,0.03); }
+  .set-action-item:hover { background: var(--surface-hover); }
   .set-action-item .set-title { font-size: 15px; font-weight: 700; color: var(--text); }
-  .set-action-item .set-sub { font-size: 12px; font-weight: 500; color: rgba(26,18,0,0.6); margin-top: 2px; }
+  .set-action-item .set-sub { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
   .set-action-icon {
     width: 36px; height: 36px; border-radius: 10px;
-    background: rgba(0,0,0,0.07); display: flex; align-items: center; justify-content: center;
+    background: var(--surface-hover); display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
 
@@ -154,7 +256,7 @@
     display: flex; flex-direction: column; gap: 16px;
     opacity: 0; pointer-events: none;
     transform: translateY(-10px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
+    transition: all 0.22s ease;
   }
   .search-overlay.active {
     opacity: 1; pointer-events: auto;
@@ -162,20 +264,44 @@
   }
   .search-header { display: flex; gap: 12px; align-items: center; }
   .search-input {
-    flex: 1; padding: 14px 16px; border-radius: 12px; border: 1.5px solid rgba(0,0,0,0.2);
-    background: rgba(255,255,255,0.3); color: var(--text); font-size: 16px;
-    font-family: inherit; font-weight: 700; outline: none; transition: background 0.2s;
+    flex: 1; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--divider);
+    background: var(--surface); color: var(--text); font-size: 16px;
+    font-family: inherit; font-weight: 700; outline: none; transition: all 0.2s;
   }
-  .search-input:focus { background: rgba(255,255,255,0.5); }
+  .search-input:focus { 
+    background: var(--surface); 
+    border-color: var(--accent);
+  }
   .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
-  .search-close { font-weight: 800; background: transparent; border: none; cursor: pointer; color: var(--text); font-size: 14px; text-transform: uppercase; }
+  .search-close { 
+    font-weight: 800; 
+    background: transparent; 
+    border: none; 
+    cursor: pointer; 
+    color: var(--text); 
+    font-size: 14px; 
+    text-transform: uppercase; 
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  .search-close:hover { background: var(--surface-hover); }
   .search-results { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-  .search-item { padding: 16px; border-radius: 12px; background: rgba(0,0,0,0.06); cursor: pointer; transition: background 0.15s; }
-  .search-item:hover { background: rgba(0,0,0,0.12); }
-  .search-city { font-weight: 800; font-size: 18px; }
+  .search-item { 
+    padding: 16px; 
+    border-radius: 12px; 
+    background: var(--surface); 
+    cursor: pointer; 
+    transition: all 0.15s; 
+  }
+  .search-item:hover { 
+    background: var(--bg-secondary); 
+    transform: translateX(4px);
+  }
+  .search-city { font-weight: 800; font-size: 18px; color: var(--text); }
   .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
 
-  /* ─── Startup location status line ─── */
+  /* ─── Location status ─── */
   .location-status {
     display: none; align-items: center; gap: 8px;
     padding: 0 24px; margin-top: 10px;
@@ -183,7 +309,14 @@
     animation: fadeUp 0.4s ease both;
   }
   .location-status.visible { display: flex; }
-  .location-status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+  .location-status-dot { 
+    width: 6px; 
+    height: 6px; 
+    border-radius: 50%; 
+    background: var(--text-muted); 
+    flex-shrink: 0;
+    animation: pulse 2s ease-in-out infinite;
+  }
 
   /* ─── Header ─── */
   .header {
@@ -192,30 +325,57 @@
   }
   .header-left { display: flex; align-items: flex-start; gap: 16px; }
   .menu-btn { margin-top: 4px; }
-  .city-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+  .city-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; color: var(--text); }
   .header-actions { display: flex; gap: 6px; margin-top: 8px; }
   .icon-btn {
     width: 28px; height: 28px; border-radius: 6px;
-    background: rgba(0,0,0,0.10); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: background 0.15s; flex-shrink: 0;
+    background: var(--surface-hover); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.15s; flex-shrink: 0;
   }
-  .icon-btn:hover { background: rgba(0,0,0,0.18); }
+  .icon-btn:hover { 
+    background: var(--accent); 
+    transform: scale(1.1);
+  }
+  .icon-btn:hover svg { stroke: var(--bg); }
   .live-badge {
-    background: var(--text); color: var(--bg); font-size: 10px; font-weight: 800;
-    padding: 5px 10px; border-radius: 20px; letter-spacing: 0.5px; margin-top: 4px;
-    transition: opacity 0.3s, transform 0.3s;
+    background: var(--live-dot); 
+    color: var(--bg); 
+    font-size: 10px; 
+    font-weight: 800;
+    padding: 5px 10px; 
+    border-radius: 20px; 
+    letter-spacing: 0.5px; 
+    margin-top: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
   .live-badge.hidden { opacity: 0; transform: scale(0.9); }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bg);
+    animation: pulse 2s ease-in-out infinite;
+  }
 
   /* ─── Hero (today only) ─── */
-  .temp-section { padding: 24px 24px 0; display: flex; align-items: flex-start; gap: 14px; animation: fadeUp 0.5s ease 0.1s both; }
+  .temp-section { 
+    padding: 24px 24px 0; 
+    display: flex; 
+    align-items: flex-start; 
+    gap: 14px; 
+    animation: fadeUp 0.5s ease 0.1s both; 
+  }
   .sun-icon { margin-top: 10px; flex-shrink: 0; }
+  .sun-icon svg { stroke: var(--text); fill: var(--text); }
   .temp-row { display: flex; align-items: baseline; line-height: 1; }
-  .temp-current { font-size: 76px; font-weight: 900; letter-spacing: -5px; line-height: 1; transition: opacity 0.3s; }
-  .temp-unit { font-size: 30px; font-weight: 700; letter-spacing: -1px; margin-top: 8px; }
+  .temp-current { font-size: 76px; font-weight: 900; letter-spacing: -5px; line-height: 1; transition: opacity 0.3s; color: var(--text); }
+  .temp-unit { font-size: 30px; font-weight: 700; letter-spacing: -1px; margin-top: 8px; color: var(--text); }
   .temp-divider { font-size: 22px; font-weight: 400; color: var(--text-muted); margin: 0 5px; margin-top: 16px; }
   .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; transition: opacity 0.3s; }
-  .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; }
+  .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; color: var(--text); }
 
   /* ─── Today's Chart ─── */
   .chart-section { padding: 6px 16px 0; animation: fadeUp 0.5s ease 0.25s both; }
@@ -233,7 +393,7 @@
     cursor: pointer; transition: background 0.15s;
     overflow: hidden;
   }
-  .forecast-row:hover { background: rgba(0,0,0,0.04); }
+  .forecast-row:hover { background: var(--surface-hover); }
   .forecast-row:last-child { border-bottom: none; }
 
   .forecast-row-header {
@@ -242,17 +402,17 @@
   }
   .forecast-day-header { display: flex; align-items: center; gap: 8px; }
   .forecast-dot {
-    width: 26px; height: 26px; border-radius: 6px; background: rgba(0,0,0,0.10);
+    width: 26px; height: 26px; border-radius: 6px; background: var(--surface-hover);
     display: flex; align-items: center; justify-content: center;
-    font-size: 9px; font-weight: 800;
-    transition: background 0.2s, color 0.2s;
+    font-size: 9px; font-weight: 800; color: var(--text);
+    transition: all 0.2s;
   }
-  .forecast-row.expanded .forecast-dot { background: var(--text); color: var(--bg); }
+  .forecast-row.expanded .forecast-dot { background: var(--accent); color: var(--bg); }
   .forecast-date { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-  .forecast-condition { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; padding-left: 34px; }
+  .forecast-condition { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; padding-left: 34px; color: var(--text); }
   .forecast-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); padding-left: 34px; }
 
-  /* ─── Expandable Mini-Chart per forecast day ─── */
+  /* ─── Expandable Mini-Chart ─── */
   .forecast-expand {
     max-height: 0;
     overflow: hidden;
@@ -275,6 +435,7 @@
   .mini-time-axis { display: flex; justify-content: space-between; padding: 2px 10px 0; }
   .mini-time-tick { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
 
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
   @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.06); } }
   .sun-anim { animation: pulse-glow 3s ease-in-out infinite; transform-origin: center; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -282,7 +443,7 @@
 </head>
 <body>
 
-<!-- Toast notification (slim pill, replaces browser alert) -->
+<!-- Toast notification -->
 <div class="toast" id="toast">
   <div class="toast-icon" id="toast-icon">📍</div>
   <div class="toast-body">
@@ -297,6 +458,26 @@
   <div class="set-header" onclick="toggleSidebar()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     SETTINGS
+  </div>
+
+  <div class="set-section-label">Appearance</div>
+
+  <div class="set-item">
+    <div class="set-item-title">Theme</div>
+    <div class="theme-group">
+      <button class="theme-btn active" data-theme="orange" onclick="selectTheme('orange')">
+        <div class="theme-swatch"></div>
+        Orange
+      </button>
+      <button class="theme-btn" data-theme="light" onclick="selectTheme('light')">
+        <div class="theme-swatch"></div>
+        Light
+      </button>
+      <button class="theme-btn" data-theme="dark" onclick="selectTheme('dark')">
+        <div class="theme-swatch"></div>
+        Dark
+      </button>
+    </div>
   </div>
 
   <div class="set-section-label">Units</div>
@@ -330,7 +511,7 @@
 
   <div class="set-action-item" onclick="document.getElementById('btn-gps').click(); toggleSidebar();">
     <div class="set-action-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
     </div>
     <div>
       <div class="set-title">Update Location</div>
@@ -340,7 +521,7 @@
 
   <div class="set-action-item" onclick="openSearch(); toggleSidebar();">
     <div class="set-action-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
     </div>
     <div>
       <div class="set-title">Search City</div>
@@ -361,24 +542,27 @@
   <div class="header">
     <div class="header-left">
       <div class="icon-btn menu-btn" onclick="toggleSidebar()" aria-label="Menu">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       </div>
       <div>
         <div class="city-name" id="display-city">Locating...</div>
         <div class="header-actions">
           <div class="icon-btn" id="btn-gps" title="Use GPS Location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           </div>
           <div class="icon-btn" onclick="openSearch()" title="Search City">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a1200" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
         </div>
       </div>
     </div>
-    <div class="live-badge hidden" id="live-badge">LIVE</div>
+    <div class="live-badge hidden" id="live-badge">
+      <span class="live-dot"></span>
+      LIVE
+    </div>
   </div>
 
-  <!-- Location status line (shown on denied/error, hidden once data loads) -->
+  <!-- Location status line -->
   <div class="location-status" id="location-status">
     <div class="location-status-dot"></div>
     <span id="location-status-text">Unable to fetch current location </span>
@@ -403,7 +587,7 @@
   <!-- Today chart -->
   <div class="chart-section">
     <svg class="chart-svg" id="today-chart-svg" viewBox="0 0 358 160" xmlns="http://www.w3.org/2000/svg">
-      <line x1="6" y1="148" x2="352" y2="148" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
+      <line x1="6" y1="148" x2="352" y2="148" stroke="currentColor" stroke-width="1" stroke-opacity="0.12"/>
     </svg>
     <div class="time-axis" id="time-axis"></div>
   </div>
@@ -420,11 +604,37 @@ const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const NOM_URL = 'https://nominatim.openstreetmap.org/reverse';
 
 let globalWeatherData = null;
-let settings = { temp: 'C', wind: 'kmh', time: '12' };
+let settings = { temp: 'C', wind: 'kmh', time: '12', theme: 'orange' };
 let expandedRow = null;
 let toastTimer = null;
 
-// ─── Toast System (slim pill, replaces all alert() calls) ─────────────────
+// ─── Theme System ────────────────────────────────────────────────────────
+function selectTheme(theme) {
+  settings.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
+  
+  // Save to localStorage
+  localStorage.setItem('weather-theme', theme);
+  
+  // Re-render charts with new colors
+  if (globalWeatherData) {
+    renderTodayChart();
+    if (expandedRow !== null) {
+      const rows = document.querySelectorAll('.forecast-row');
+      if (rows[expandedRow]) renderMiniChart(rows[expandedRow], expandedRow + 1);
+    }
+  }
+}
+
+// Load saved theme on startup
+function loadTheme() {
+  const savedTheme = localStorage.getItem('weather-theme') || 'orange';
+  selectTheme(savedTheme);
+}
+
+// ─── Toast System ─────────────────────────────────────────────────────────
 function showToast(icon, title, msg, actionLabel, actionFn) {
   clearTimeout(toastTimer);
   document.getElementById('toast-icon').textContent = icon;
@@ -456,6 +666,8 @@ function selectToggle(el, group) {
   document.querySelectorAll(`.toggle-btn[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   settings[group] = el.dataset.val;
+  localStorage.setItem(`weather-${group}`, el.dataset.val);
+  
   if (globalWeatherData) {
     renderTodayHero();
     renderTodayChart();
@@ -465,6 +677,19 @@ function selectToggle(el, group) {
       if (rows[expandedRow]) renderMiniChart(rows[expandedRow], expandedRow + 1);
     }
   }
+}
+
+// Load saved settings
+function loadSettings() {
+  ['temp', 'wind', 'time'].forEach(key => {
+    const saved = localStorage.getItem(`weather-${key}`);
+    if (saved) {
+      settings[key] = saved;
+      document.querySelectorAll(`.toggle-btn[data-group="${key}"]`).forEach(b => {
+        b.classList.toggle('active', b.dataset.val === saved);
+      });
+    }
+  });
 }
 
 // ─── Search ───────────────────────────────────────────────────────────────
@@ -504,22 +729,22 @@ function selectCity(lat, lon, name) {
 
 // ─── Weather Helpers ──────────────────────────────────────────────────────
 function wmoLabel(code) {
-  if (code === 0) return 'Sunny';
-  if (code === 1) return 'Mostly Sunny';
+  if (code === 0) return 'Clear Sky';
+  if (code === 1) return 'Mostly Clear';
   if (code === 2) return 'Partly Cloudy';
   if (code === 3) return 'Overcast';
-  if (code <= 48) return 'Fog';
+  if (code <= 48) return 'Foggy';
   if (code <= 57) return 'Drizzle';
-  if (code <= 67) return 'Rain';
-  if (code <= 77) return 'Snow';
-  if (code <= 82) return 'Showers';
+  if (code <= 67) return 'Rainy';
+  if (code <= 77) return 'Snowy';
+  if (code <= 82) return 'Rain Showers';
   if (code <= 86) return 'Snow Showers';
-  return 'Storms';
+  return 'Thunderstorms';
 }
 
-// Dynamic weather icon SVGs keyed by condition category
+// Dynamic weather icon SVGs
 function wmoIcon(code) {
-  const c = '#1a1200';
+  const c = 'currentColor';
   const op = 'opacity="0.85"';
 
   // ☀️ Sunny / Clear
@@ -558,7 +783,7 @@ function wmoIcon(code) {
       <circle cx="26" cy="19" r="5" fill="${c}" ${op}/>
     </svg>`;
 
-  // 🌫️ Fog / Mist
+  // 🌫️ Fog
   if (code <= 48) return `
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
       <rect x="4" y="8" width="24" height="3" rx="1.5" fill="${c}" opacity="0.35"/>
@@ -567,7 +792,7 @@ function wmoIcon(code) {
       <rect x="4" y="26" width="24" height="3" rx="1.5" fill="${c}" opacity="0.25"/>
     </svg>`;
 
-  // 🌧️ Drizzle / Light rain
+  // 🌧️ Drizzle
   if (code <= 57) return `
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
       <rect x="5" y="6" width="22" height="10" rx="5" fill="${c}" ${op}/>
@@ -628,7 +853,7 @@ function wmoIcon(code) {
       <line x1="20" y1="21" x2="18" y2="27" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
     </svg>`;
 
-  // ⛈️ Storms / Thunderstorm
+  // ⛈️ Storms
   return `
     <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
       <rect x="4" y="5" width="24" height="10" rx="5" fill="${c}" ${op}/>
@@ -649,14 +874,17 @@ function fmtTime(dateStr) {
     return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
   }
   let h = d.getHours() % 12 || 12;
-  return `${h}${d.getMinutes() === 0 ? '' : ':' + String(d.getMinutes()).padStart(2,'0')}`;
+  const m = d.getMinutes();
+  const ap = d.getHours() >= 12 ? 'pm' : 'am';
+  return `${h}${m === 0 ? '' : ':' + String(m).padStart(2,'0')}${ap}`;
 }
 
 function fmtHour(dateStr) {
   const d = new Date(dateStr);
   if (settings.time === '24') return String(d.getHours()).padStart(2,'0');
   let h = d.getHours() % 12 || 12;
-  return String(h);
+  const ap = d.getHours() >= 12 ? 'pm' : 'am';
+  return `${h}${ap}`;
 }
 
 async function jfetch(url) {
@@ -705,7 +933,7 @@ function renderTodayHero() {
   document.getElementById('temp-low').textContent = cvtTemp(d.daily.temperature_2m_min[0]) + '°';
   document.getElementById('live-badge').classList.remove('hidden');
 
-  // Use hourly weather_code at current hour — more accurate than daily current
+  // Get current hour's weather code for more accuracy
   const now = new Date();
   const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
   const currentCode = (nowHourIdx >= 0 && d.hourly.weather_code)
@@ -716,7 +944,7 @@ function renderTodayHero() {
   document.getElementById('weather-icon').innerHTML = wmoIcon(currentCode);
 }
 
-// ─── Build SVG Chart Path (shared by today + mini) ────────────────────────
+// ─── Build SVG Chart Path ──────────────────────────────────────────────────
 function buildChartPath(temps, svgW, svgH, padX, padY) {
   const minT = Math.min(...temps);
   const maxT = Math.max(...temps);
@@ -726,6 +954,7 @@ function buildChartPath(temps, svgW, svgH, padX, padY) {
     const y = svgH - padY - ((t - minT) / range) * (svgH - padY * 2);
     return [x, y];
   });
+  
   // Smooth curve via cubic bezier
   let path = `M ${pts[0][0]} ${pts[0][1]}`;
   for (let i = 1; i < pts.length; i++) {
@@ -738,7 +967,7 @@ function buildChartPath(temps, svgW, svgH, padX, padY) {
   return { path, pts, minT, maxT };
 }
 
-// ─── Render Today Chart ───────────────────────────────────────────────────
+// ─── Render Today Chart with accurate live dot ────────────────────────────
 function renderTodayChart() {
   const d = globalWeatherData;
   const svg = document.getElementById('today-chart-svg');
@@ -748,52 +977,80 @@ function renderTodayChart() {
   const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
   const now = new Date();
 
-  // 7 points: hours 0,3,6,9,12,15,18 of the day
-  const step = 3;
+  // Get all 24 hours of today for more accurate chart
   const hours = [];
-  for (let i = 0; i < 7; i++) hours.push(startIdx + i * step);
+  const temps = [];
+  for (let i = 0; i < 24; i++) {
+    if (startIdx + i < d.hourly.time.length) {
+      hours.push(startIdx + i);
+      temps.push(cvtTemp(d.hourly.temperature_2m[startIdx + i]));
+    }
+  }
 
-  const temps = hours.map(idx => cvtTemp(d.hourly.temperature_2m[idx]));
-  const timeLabels = hours.map(idx => fmtHour(d.hourly.time[idx]));
+  // Pick 7 evenly spaced points for display
+  const displayIndices = [0, 4, 8, 12, 16, 20, 23];
+  const displayTemps = displayIndices.map(i => temps[i] || temps[temps.length - 1]);
+  const timeLabels = displayIndices.map(i => fmtHour(d.hourly.time[hours[i]]));
 
-  const { path, pts, minT, maxT } = buildChartPath(temps, 358, 148, 20, 20);
-  const range = maxT - minT || 1;
+  const { path, pts } = buildChartPath(displayTemps, 358, 148, 20, 25);
+  
+  // Calculate real min/max from ALL hours for accurate positioning
+  const actualMinT = Math.min(...temps);
+  const actualMaxT = Math.max(...temps);
+  const actualRange = actualMaxT - actualMinT || 1;
 
-  // ── Live dot: map current time precisely to chart x-axis ──
-  // Chart spans from chartHour[0] to chartHour[6] (0h to 18h of today by default)
-  const chartStartTime = new Date(d.hourly.time[hours[0]]);
-  const chartEndTime   = new Date(d.hourly.time[hours[hours.length - 1]]);
-  const totalMs = chartEndTime - chartStartTime;
-  const elapsedMs = Math.max(0, Math.min(totalMs, now - chartStartTime));
-  const nowFrac = elapsedMs / totalMs;                    // 0–1 across chart width
+  // Live dot - precise positioning based on current time
+  const todayStart = new Date(d.hourly.time[hours[0]]);
+  const todayEnd = new Date(d.hourly.time[hours[23]] || d.hourly.time[hours[hours.length - 1]]);
+  const totalMs = todayEnd - todayStart;
+  const elapsedMs = Math.max(0, Math.min(totalMs, now - todayStart));
+  const nowFrac = elapsedMs / totalMs;
   const liveX = 20 + nowFrac * (358 - 40);
 
-  // Y: interpolate temperature at current time between surrounding hourly points
-  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
-  const clampedIdx = Math.max(hours[0], Math.min(hours[hours.length-1], nowHourIdx));
-  const nowTemp = cvtTemp(d.hourly.temperature_2m[clampedIdx]);
-  const liveY = 148 - 20 - ((nowTemp - minT) / range) * (148 - 40);
+  // Interpolate temperature at current time
+  const hoursSinceStart = elapsedMs / (1000 * 60 * 60);
+  const hourIndex = Math.floor(hoursSinceStart);
+  const hourFraction = hoursSinceStart - hourIndex;
+  let liveTemp;
+  
+  if (hourIndex < temps.length - 1) {
+    liveTemp = temps[hourIndex] + (temps[hourIndex + 1] - temps[hourIndex]) * hourFraction;
+  } else {
+    liveTemp = temps[temps.length - 1];
+  }
+  
+  const liveY = 148 - 25 - ((liveTemp - actualMinT) / actualRange) * (148 - 50);
 
-  // Sunrise / sunset lines positioned by time-of-day fraction
+  // Sunrise/sunset lines
   const sr = new Date(d.daily.sunrise[0]);
   const ss = new Date(d.daily.sunset[0]);
-  const xByTime = (t) => {
-    const frac = Math.max(0, Math.min(1, (t - chartStartTime) / totalMs));
-    return 20 + frac * (358 - 40);
-  };
-  const srX = xByTime(sr);
-  const ssX = xByTime(ss);
+  const srFrac = Math.max(0, Math.min(1, (sr - todayStart) / totalMs));
+  const ssFrac = Math.max(0, Math.min(1, (ss - todayStart) / totalMs));
+  const srX = 20 + srFrac * (358 - 40);
+  const ssX = 20 + ssFrac * (358 - 40);
+
+  // Get theme-aware colors
+  const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
+  const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--live-dot').trim();
 
   svg.innerHTML = `
-    <line x1="6" y1="148" x2="352" y2="148" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
-    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
-    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.45">${fmtTime(d.daily.sunrise[0])}</text>
-    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="#1a1200" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
-    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.45">${fmtTime(d.daily.sunset[0])}</text>
-    <path d="${path}" fill="none" stroke="#1a1200" stroke-width="2.2" stroke-opacity="0.75" stroke-linecap="round"/>
-    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="#1a1200" opacity="${i===3?'0.95':'0.6'}">${temps[i]}°</text>`).join('')}
-    <circle cx="${liveX}" cy="${liveY}" r="10" fill="#1a1200" opacity="0.08"/>
-    <circle cx="${liveX}" cy="${liveY}" r="5" fill="#1a1200" opacity="0.85"/>
+    <defs>
+      <linearGradient id="tempGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:${lineColor};stop-opacity:0.15" />
+        <stop offset="100%" style="stop-color:${lineColor};stop-opacity:0.02" />
+      </linearGradient>
+    </defs>
+    <line x1="6" y1="148" x2="352" y2="148" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.12"/>
+    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(d.daily.sunrise[0])}</text>
+    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(d.daily.sunset[0])}</text>
+    <path d="${path} L ${pts[pts.length-1][0]} 148 L ${pts[0][0]} 148 Z" fill="url(#tempGrad)"/>
+    <path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2.2" stroke-opacity="0.75" stroke-linecap="round"/>
+    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[i]}°</text>`).join('')}
+    <circle cx="${liveX}" cy="${liveY}" r="10" fill="${dotColor}" opacity="0.08"/>
+    <circle cx="${liveX}" cy="${liveY}" r="5" fill="${dotColor}" opacity="0.85"/>
+    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(liveTemp)}°</text>
   `;
 
   timeAxis.innerHTML = timeLabels.map(l => `<span class="time-tick">${l}</span>`).join('');
@@ -837,12 +1094,7 @@ function renderForecastList() {
 // ─── Toggle Expand/Collapse Forecast Row ──────────────────────────────────
 function toggleForecastRow(row, dayIdx) {
   const isOpen = row.classList.contains('expanded');
-
-  // Close any open row
-  document.querySelectorAll('.forecast-row.expanded').forEach(r => {
-    r.classList.remove('expanded');
-  });
-
+  document.querySelectorAll('.forecast-row.expanded').forEach(r => r.classList.remove('expanded'));
   if (!isOpen) {
     row.classList.add('expanded');
     expandedRow = dayIdx - 1;
@@ -852,7 +1104,7 @@ function toggleForecastRow(row, dayIdx) {
   }
 }
 
-// ─── Render Mini Chart inside a forecast row ──────────────────────────────
+// ─── Render Mini Chart ─────────────────────────────────────────────────────
 function renderMiniChart(row, dayIdx) {
   const d = globalWeatherData;
   const svg = row.querySelector('.mini-chart-svg');
@@ -868,16 +1120,18 @@ function renderMiniChart(row, dayIdx) {
   const timeLabels = hours.map(idx => fmtHour(d.hourly.time[idx]));
 
   const { path, pts } = buildChartPath(temps, 320, 82, 16, 14);
+  
+  const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
 
   svg.innerHTML = `
-    <line x1="4" y1="82" x2="316" y2="82" stroke="#1a1200" stroke-width="1" stroke-opacity="0.12"/>
-    <path d="${path}" fill="none" stroke="#1a1200" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
-    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1]-6}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="#1a1200" opacity="0.65">${temps[i]}°</text>`).join('')}
+    <line x1="4" y1="82" x2="316" y2="82" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.12"/>
+    <path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
+    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1]-6}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.65">${temps[i]}°</text>`).join('')}
   `;
   axis.innerHTML = timeLabels.map(l => `<span class="mini-time-tick">${l}</span>`).join('');
 }
 
-// ─── Location Status (inline, no toast on startup) ────────────────────────
+// ─── Location Status ────────────────────────────────────────────────────────
 function showLocationStatus(msg) {
   const el = document.getElementById('location-status');
   document.getElementById('location-status-text').textContent = msg;
@@ -919,7 +1173,11 @@ document.getElementById('btn-gps').addEventListener('click', () => {
 });
 
 // ─── Init ─────────────────────────────────────────────────────────────────
-window.onload = () => document.getElementById('btn-gps').click();
+window.onload = () => {
+  loadTheme();
+  loadSettings();
+  document.getElementById('btn-gps').click();
+};
 </script>
 </body>
 </html>
