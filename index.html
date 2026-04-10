@@ -88,7 +88,7 @@
     position: relative;
   }
 
-  /* ─── Toast Notification ─── */
+  /* â”€â”€â”€ Toast Notification â”€â”€â”€ */
   .toast {
     position: fixed;
     bottom: 28px;
@@ -140,7 +140,7 @@
   }
   .toast-action:hover { opacity: 0.25; }
 
-  /* ─── Sidebar ─── */
+  /* â”€â”€â”€ Sidebar â”€â”€â”€ */
   .sidebar-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 998;
     opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
@@ -148,160 +148,193 @@
   .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
   .sidebar {
-    position: fixed; top: 0; left: 0; bottom: 0; width: 280px; max-width: 80vw;
+    position: fixed; top: 0; left: 0; bottom: 0; width: 292px; max-width: 82vw;
     background: var(--surface); z-index: 999;
-    transform: translateX(-100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 8px 0 28px rgba(0,0,0,0.16);
     display: flex; flex-direction: column; overflow-y: auto;
   }
   .sidebar.active { transform: translateX(0); }
 
   .set-header {
-    display: flex; align-items: center; gap: 12px; padding: 24px 20px;
-    font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
+    display: flex; align-items: center; gap: 12px; padding: 24px 20px 18px;
+    font-size: 19px; font-weight: 800; letter-spacing: 0.4px;
     cursor: pointer; border-bottom: 1px solid var(--divider);
     color: var(--text);
   }
-  .set-section-label {
-    font-size: 10px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 1.2px; color: var(--text-muted);
-    padding: 18px 20px 8px;
+  .set-header svg { flex-shrink: 0; }
+  .set-section-label,
+  .set-item,
+  .set-action-item {
+    display: none;
   }
-  .set-item {
-    padding: 14px 20px; border-bottom: 1px solid var(--divider);
+  .sidebar-note { display: none; }
+  .sidebar-body {
+    padding: 8px 0 20px;
   }
-  .set-item-title {
-    font-size: 13px; font-weight: 700; color: var(--text);
-    margin-bottom: 10px;
+  .sidebar-section {
+    border-bottom: 1px solid var(--divider);
   }
-  
-  /* Toggle pill group */
-  .toggle-group {
-    display: flex; gap: 6px; flex-wrap: wrap;
-  }
-  .toggle-btn {
-    padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--divider);
-    background: transparent; color: var(--text-muted);
-    font-size: 12px; font-weight: 700; font-family: inherit;
-    cursor: pointer; transition: all 0.2s ease;
-    letter-spacing: 0.3px;
-  }
-  .toggle-btn:hover { background: var(--surface-hover); }
-  .toggle-btn.active {
-    background: var(--accent); color: var(--bg);
-    border-color: var(--accent);
-  }
-
-  /* Theme pills */
-  .theme-group {
-    display: flex; gap: 8px;
-  }
-  .theme-btn {
-    flex: 1;
-    padding: 12px; 
-    border-radius: 12px; 
-    border: 2px solid var(--divider);
+  .sidebar-trigger {
+    width: 100%;
+    border: none;
     background: transparent;
-    font-size: 11px; 
-    font-weight: 800; 
-    font-family: inherit;
-    cursor: pointer; 
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    color: var(--text);
+    font: inherit;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 6px;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: background 0.18s ease;
+  }
+  .sidebar-trigger:hover,
+  .sidebar-section.open .sidebar-trigger {
+    background: var(--surface-hover);
+  }
+  .sidebar-trigger-label {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.1px;
+  }
+  .sidebar-trigger-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: var(--text-muted);
   }
-  .theme-btn:hover { 
-    border-color: var(--text-muted); 
-    transform: translateY(-1px);
+  .sidebar-current {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
   }
-  .theme-btn.active {
-    background: var(--accent); 
-    color: var(--bg);
-    border-color: var(--accent);
-    transform: scale(1.02);
+  .sidebar-chevron {
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.22s ease;
+    margin-top: -3px;
   }
-  .theme-swatch {
-    width: 24px; 
-    height: 24px; 
-    border-radius: 6px;
-    border: 1.5px solid var(--divider);
+  .sidebar-section.open .sidebar-chevron {
+    transform: rotate(225deg);
+    margin-top: 2px;
   }
-  .theme-btn[data-theme="orange"] .theme-swatch { background: #F5C842; }
-  .theme-btn[data-theme="light"] .theme-swatch { background: #ffffff; }
-  .theme-btn[data-theme="dark"] .theme-swatch { background: #0a0a0a; }
+  .sidebar-options {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.24s ease;
+    padding: 0 20px;
+  }
+  .sidebar-section.open .sidebar-options {
+    max-height: 200px;
+    padding-bottom: 18px;
+  }
+  .sidebar-option {
+    width: 100%;
+    border: none;
+    border-top: 1px solid var(--divider);
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 0;
+    cursor: pointer;
+    transition: color 0.18s ease, transform 0.18s ease;
+  }
+  .sidebar-option:hover,
+  .sidebar-option.active {
+    color: var(--text);
+    transform: translateX(4px);
+  }
 
-  .set-action-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 16px 20px; border-bottom: 1px solid var(--divider);
-    cursor: pointer; transition: background 0.15s;
-  }
-  .set-action-item:hover { background: var(--surface-hover); }
-  .set-action-item .set-title { font-size: 15px; font-weight: 700; color: var(--text); }
-  .set-action-item .set-sub { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-top: 2px; }
-  .set-action-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    background: var(--surface-hover); display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
-  /* ─── Search Overlay ─── */
+  /* â”€â”€â”€ Search Overlay â”€â”€â”€ */
   .search-overlay {
-    position: fixed; inset: 0; background: var(--bg); z-index: 1000;
-    padding: 52px 24px 24px;
-    display: flex; flex-direction: column; gap: 16px;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.16);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1000;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
     opacity: 0; pointer-events: none;
-    transform: translateY(-10px);
-    transition: all 0.22s ease;
+    transition: opacity 0.22s ease;
   }
   .search-overlay.active {
     opacity: 1; pointer-events: auto;
-    transform: translateY(0);
   }
-  .search-header { display: flex; gap: 12px; align-items: center; }
+  .search-panel {
+    width: min(100%, 390px);
+    background: var(--bg);
+    border: 1px solid var(--divider);
+    border-radius: 18px;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.14);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transform: translateY(16px) scale(0.98);
+    transition: transform 0.24s ease;
+  }
+  .search-overlay.active .search-panel {
+    transform: translateY(0) scale(1);
+  }
+  .search-intro,
+  .search-close {
+    display: none;
+  }
+  .search-header { display: flex; align-items: center; }
   .search-input {
-    flex: 1; padding: 14px 16px; border-radius: 12px; border: 1.5px solid var(--divider);
-    background: var(--surface); color: var(--text); font-size: 16px;
-    font-family: inherit; font-weight: 700; outline: none; transition: all 0.2s;
+    flex: 1; padding: 14px 15px; border-radius: 14px; border: 1px solid var(--divider);
+    background: var(--surface); color: var(--text); font-size: 15px;
+    font-family: inherit; font-weight: 700; outline: none;
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
   }
   .search-input:focus { 
-    background: var(--surface); 
     border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
   }
   .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
-  .search-close { 
-    font-weight: 800; 
-    background: transparent; 
-    border: none; 
-    cursor: pointer; 
-    color: var(--text); 
-    font-size: 14px; 
-    text-transform: uppercase; 
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: background 0.15s;
+  .search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    min-height: 0;
+    max-height: 52vh;
   }
-  .search-close:hover { background: var(--surface-hover); }
-  .search-results { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
   .search-item { 
-    padding: 16px; 
-    border-radius: 12px; 
+    padding: 14px 16px; 
+    border-radius: 16px; 
+    border: 1px solid transparent;
     background: var(--surface); 
     cursor: pointer; 
-    transition: all 0.15s; 
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
   }
   .search-item:hover { 
-    background: var(--bg-secondary); 
-    transform: translateX(4px);
+    background: var(--surface); 
+    border-color: var(--divider);
+    transform: translateY(-1px);
   }
-  .search-city { font-weight: 800; font-size: 18px; color: var(--text); }
-  .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 2px; text-transform: uppercase; }
+  .search-city { font-weight: 800; font-size: 16px; color: var(--text); }
+  .search-country { font-weight: 600; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .search-state {
+    padding: 6px 4px 0;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
 
-  /* ─── Location status ─── */
+  /* â”€â”€â”€ Location status â”€â”€â”€ */
   .location-status {
     display: none; align-items: center; gap: 8px;
     padding: 0 24px; margin-top: 10px;
@@ -318,10 +351,11 @@
     animation: pulse 2s ease-in-out infinite;
   }
 
-  /* ─── Header ─── */
+  /* â”€â”€â”€ Header â”€â”€â”€ */
   .header {
     display: flex; align-items: flex-start; justify-content: space-between;
     padding: 0 24px; animation: fadeUp 0.45s ease both;
+    gap: 14px;
   }
   .header-left { display: flex; align-items: flex-start; gap: 16px; }
   .menu-btn { margin-top: 4px; }
@@ -337,30 +371,76 @@
     transform: scale(1.1);
   }
   .icon-btn:hover svg { stroke: var(--bg); }
-  .live-badge {
-    background: var(--live-dot); 
-    color: var(--bg); 
-    font-size: 10px; 
-    font-weight: 800;
-    padding: 5px 10px; 
-    border-radius: 20px; 
-    letter-spacing: 0.5px; 
-    margin-top: 4px;
-    transition: all 0.3s;
+  .live-status {
+    min-width: 108px;
+    padding-top: 2px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .live-status.hidden {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  .live-status-head {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text);
   }
-  .live-badge.hidden { opacity: 0; transform: scale(0.9); }
-  .live-dot {
-    width: 6px;
-    height: 6px;
+  .live-status-meta {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .live-status-indicator {
+    width: 18px;
+    height: 10px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .live-status-dot,
+  .live-status-bar {
     border-radius: 50%;
-    background: var(--bg);
-    animation: pulse 2s ease-in-out infinite;
+    background: var(--live-dot);
+    flex-shrink: 0;
   }
+  .live-status-dot {
+    width: 8px;
+    height: 8px;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  .live-status-bars {
+    display: none;
+    width: 18px;
+    height: 10px;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .live-status-bar {
+    width: 4px;
+    animation: liveBars 0.9s ease-in-out infinite;
+  }
+  .live-status-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+  .live-status-bar:nth-child(2) { height: 8px; animation-delay: 0.1s; }
+  .live-status-bar:nth-child(3) { height: 6px; animation-delay: 0.2s; }
+  .live-status.is-syncing .live-status-bars { display: inline-flex; }
+  .live-status.is-syncing .live-status-dot { display: none; }
+  .live-status.is-live .live-status-dot { opacity: 1; }
+  .live-status.is-updated .live-status-dot,
+  .live-status.is-offline .live-status-dot { opacity: 0.45; animation: none; }
 
-  /* ─── Hero (today only) ─── */
+  /* â”€â”€â”€ Hero (today only) â”€â”€â”€ */
   .temp-section { 
     padding: 24px 24px 0; 
     display: flex; 
@@ -377,16 +457,17 @@
   .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; transition: opacity 0.3s; }
   .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; color: var(--text); }
 
-  /* ─── Today's Chart ─── */
+  /* â”€â”€â”€ Today's Chart â”€â”€â”€ */
   .chart-section { padding: 6px 16px 0; animation: fadeUp 0.5s ease 0.25s both; }
-  .chart-svg { width: 100%; height: 180px; overflow: visible; }
+  .chart-svg { width: 100%; height: 180px; overflow: visible; display: block; }
   .time-axis { display: flex; justify-content: space-between; padding: 2px 20px 0; }
   .time-tick { font-size: 11px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
+  .chart-hint { display: none; }
 
-  /* ─── Divider ─── */
+  /* â”€â”€â”€ Divider â”€â”€â”€ */
   .divider { height: 1px; background: var(--divider); margin: 16px 24px 0; }
 
-  /* ─── Forecast Rows ─── */
+  /* â”€â”€â”€ Forecast Rows â”€â”€â”€ */
   .forecast-section { padding: 4px 0; animation: fadeUp 0.5s ease 0.4s both; }
   .forecast-row {
     border-bottom: 1px solid var(--divider);
@@ -412,7 +493,7 @@
   .forecast-condition { font-size: 19px; font-weight: 800; letter-spacing: -0.3px; padding-left: 34px; color: var(--text); }
   .forecast-sub { font-size: 14px; font-weight: 500; color: var(--text-muted); padding-left: 34px; }
 
-  /* ─── Expandable Mini-Chart ─── */
+  /* â”€â”€â”€ Expandable Mini-Chart â”€â”€â”€ */
   .forecast-expand {
     max-height: 0;
     overflow: hidden;
@@ -436,6 +517,10 @@
   .mini-time-tick { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+  @keyframes liveBars {
+    0%, 100% { transform: scaleY(0.55); opacity: 0.4; }
+    50% { transform: scaleY(1); opacity: 1; }
+  }
   @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.06); } }
   .sun-anim { animation: pulse-glow 3s ease-in-out infinite; transform-origin: center; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -445,10 +530,10 @@
 
 <!-- Toast notification -->
 <div class="toast" id="toast">
-  <div class="toast-icon" id="toast-icon">📍</div>
+  <div class="toast-icon" id="toast-icon">ðŸ“</div>
   <div class="toast-body">
     <span class="toast-title" id="toast-title">Location Denied</span>
-    <span class="toast-msg" id="toast-msg"> · Tap Search to find your city</span>
+    <span class="toast-msg" id="toast-msg"> Â· Tap Search to find your city</span>
   </div>
   <button class="toast-action" id="toast-action">Search</button>
 </div>
@@ -458,6 +543,51 @@
   <div class="set-header" onclick="toggleSidebar()">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
     SETTINGS
+  </div>
+  <div class="sidebar-note">Clean controls only. Open a section, choose the text option, and the app updates instantly.</div>
+  <div class="sidebar-body">
+    <div class="sidebar-section open" id="sidebar-section-theme">
+      <button class="sidebar-trigger" type="button" onclick="toggleSidebarPanel('theme')">
+        <span class="sidebar-trigger-label">Theme</span>
+        <span class="sidebar-trigger-meta">
+          <span class="sidebar-current" id="sidebar-current-theme">Orange</span>
+          <span class="sidebar-chevron"></span>
+        </span>
+      </button>
+      <div class="sidebar-options">
+        <button class="sidebar-option active" type="button" data-theme-option="orange" onclick="selectTheme('orange')">Orange</button>
+        <button class="sidebar-option" type="button" data-theme-option="light" onclick="selectTheme('light')">Light</button>
+        <button class="sidebar-option" type="button" data-theme-option="dark" onclick="selectTheme('dark')">Dark</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="sidebar-section-temp">
+      <button class="sidebar-trigger" type="button" onclick="toggleSidebarPanel('temp')">
+        <span class="sidebar-trigger-label">Temperature</span>
+        <span class="sidebar-trigger-meta">
+          <span class="sidebar-current" id="sidebar-current-temp">Celsius</span>
+          <span class="sidebar-chevron"></span>
+        </span>
+      </button>
+      <div class="sidebar-options">
+        <button class="sidebar-option active" type="button" data-group="temp" data-val="C" onclick="selectToggle(this, 'temp')">Celsius</button>
+        <button class="sidebar-option" type="button" data-group="temp" data-val="F" onclick="selectToggle(this, 'temp')">Fahrenheit</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section" id="sidebar-section-time">
+      <button class="sidebar-trigger" type="button" onclick="toggleSidebarPanel('time')">
+        <span class="sidebar-trigger-label">Clock</span>
+        <span class="sidebar-trigger-meta">
+          <span class="sidebar-current" id="sidebar-current-time">12 Hour</span>
+          <span class="sidebar-chevron"></span>
+        </span>
+      </button>
+      <div class="sidebar-options">
+        <button class="sidebar-option active" type="button" data-group="time" data-val="12" onclick="selectToggle(this, 'time')">12 Hour</button>
+        <button class="sidebar-option" type="button" data-group="time" data-val="24" onclick="selectToggle(this, 'time')">24 Hour</button>
+      </div>
+    </div>
   </div>
 
   <div class="set-section-label">Appearance</div>
@@ -485,8 +615,8 @@
   <div class="set-item">
     <div class="set-item-title">Temperature</div>
     <div class="toggle-group">
-      <button class="toggle-btn active" data-group="temp" data-val="C" onclick="selectToggle(this, 'temp')">°C Celsius</button>
-      <button class="toggle-btn" data-group="temp" data-val="F" onclick="selectToggle(this, 'temp')">°F Fahrenheit</button>
+      <button class="toggle-btn active" data-group="temp" data-val="C" onclick="selectToggle(this, 'temp')">Â°C Celsius</button>
+      <button class="toggle-btn" data-group="temp" data-val="F" onclick="selectToggle(this, 'temp')">Â°F Fahrenheit</button>
     </div>
   </div>
 
@@ -509,7 +639,8 @@
 
   <div class="set-section-label">Location</div>
 
-  <div class="set-action-item" onclick="document.getElementById('btn-gps').click(); toggleSidebar();">
+  <div class="set-action-item" onclick="requestLocation();
+  setInterval(refreshLiveState, 60000); toggleSidebar();">
     <div class="set-action-icon">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
     </div>
@@ -531,11 +662,20 @@
 </div>
 
 <div class="search-overlay" id="search-overlay">
-  <div class="search-header">
-    <input type="text" id="search-input" class="search-input" placeholder="Search City..." autocomplete="off">
-    <button class="search-close" onclick="closeSearch()">Cancel</button>
+  <div class="search-panel">
+    <div class="search-intro">
+      <span class="search-label">Search</span>
+      <div class="search-title">Find a city</div>
+      <div class="search-copy">Start typing and pick the place you want to follow.</div>
+    </div>
+    <div class="search-header">
+      <input type="text" id="search-input" class="search-input" placeholder="Type a city" autocomplete="off">
+      <button class="search-close" type="button" onclick="closeSearch()">Close</button>
+    </div>
+    <div class="search-results" id="search-results">
+      <div class="search-state">Search appears here as soon as you type.</div>
+    </div>
   </div>
-  <div class="search-results" id="search-results"></div>
 </div>
 
 <div class="app">
@@ -545,27 +685,37 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
       </div>
       <div>
-        <div class="city-name" id="display-city">Locating...</div>
+        <div class="city-name" id="display-city">Weather</div>
         <div class="header-actions">
           <div class="icon-btn" id="btn-gps" title="Use GPS Location">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
           </div>
           <div class="icon-btn" onclick="openSearch()" title="Search City">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
           </div>
         </div>
       </div>
     </div>
-    <div class="live-badge hidden" id="live-badge">
-      <span class="live-dot"></span>
-      LIVE
+    <div class="live-status hidden" id="live-status">
+      <div class="live-status-head">
+        <span class="live-status-indicator">
+          <span class="live-status-dot"></span>
+          <span class="live-status-bars">
+            <span class="live-status-bar"></span>
+            <span class="live-status-bar"></span>
+            <span class="live-status-bar"></span>
+          </span>
+        </span>
+        <span id="live-status-label">Live</span>
+      </div>
+      <div class="live-status-meta" id="live-status-meta">Updated just now</div>
     </div>
   </div>
 
   <!-- Location status line -->
   <div class="location-status" id="location-status">
     <div class="location-status-dot"></div>
-    <span id="location-status-text">Unable to fetch current location </span>
+    <span id="location-status-text"></span>
   </div>
 
   <!-- Hero: Today only -->
@@ -576,9 +726,9 @@
     <div>
       <div class="temp-row">
         <span class="temp-current" id="temp-current">--</span>
-        <span class="temp-unit" id="temp-unit">°</span>
+        <span class="temp-unit" id="temp-unit">Â°</span>
         <span class="temp-divider">/</span>
-        <span class="temp-low" id="temp-low">--°</span>
+        <span class="temp-low" id="temp-low">--Â°</span>
       </div>
       <div class="condition" id="condition">--</div>
     </div>
@@ -590,6 +740,7 @@
       <line x1="6" y1="148" x2="352" y2="148" stroke="currentColor" stroke-width="1" stroke-opacity="0.12"/>
     </svg>
     <div class="time-axis" id="time-axis"></div>
+    <div class="chart-hint">Swipe the graph to move across the full day</div>
   </div>
 
   <div class="divider"></div>
@@ -602,39 +753,19 @@
 const WX_URL = 'https://api.open-meteo.com/v1/forecast';
 const GEO_URL = 'https://geocoding-api.open-meteo.com/v1/search';
 const NOM_URL = 'https://nominatim.openstreetmap.org/reverse';
+const HERO_CHART_MIN_WIDTH = 358;
+const LIVE_FRESH_WINDOW_MS = 15 * 60 * 1000;
+const MIN_LOADING_MS = 1400;
 
 let globalWeatherData = null;
-let settings = { temp: 'C', wind: 'kmh', time: '12', theme: 'orange' };
+let settings = { temp: 'C', time: '12', theme: 'orange' };
 let expandedRow = null;
 let toastTimer = null;
+let lastUpdatedAt = null;
+let searchTimeout = null;
+let isFirstLoad = true;
+let initialSearchTimer = null;
 
-// ─── Theme System ────────────────────────────────────────────────────────
-function selectTheme(theme) {
-  settings.theme = theme;
-  document.documentElement.setAttribute('data-theme', theme);
-  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`.theme-btn[data-theme="${theme}"]`).classList.add('active');
-  
-  // Save to localStorage
-  localStorage.setItem('weather-theme', theme);
-  
-  // Re-render charts with new colors
-  if (globalWeatherData) {
-    renderTodayChart();
-    if (expandedRow !== null) {
-      const rows = document.querySelectorAll('.forecast-row');
-      if (rows[expandedRow]) renderMiniChart(rows[expandedRow], expandedRow + 1);
-    }
-  }
-}
-
-// Load saved theme on startup
-function loadTheme() {
-  const savedTheme = localStorage.getItem('weather-theme') || 'orange';
-  selectTheme(savedTheme);
-}
-
-// ─── Toast System ─────────────────────────────────────────────────────────
 function showToast(icon, title, msg, actionLabel, actionFn) {
   clearTimeout(toastTimer);
   document.getElementById('toast-icon').textContent = icon;
@@ -643,31 +774,29 @@ function showToast(icon, title, msg, actionLabel, actionFn) {
   const btn = document.getElementById('toast-action');
   if (actionLabel) {
     btn.textContent = actionLabel;
-    btn.onclick = () => { hideToast(); if(actionFn) actionFn(); };
+    btn.onclick = () => { hideToast(); if (actionFn) actionFn(); };
     btn.style.display = '';
   } else {
     btn.style.display = 'none';
   }
   document.getElementById('toast').classList.add('show');
-  toastTimer = setTimeout(hideToast, 5000);
+  toastTimer = setTimeout(hideToast, 4000);
 }
+
 function hideToast() {
   document.getElementById('toast').classList.remove('show');
 }
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────
-function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('active');
-  document.getElementById('sidebar-overlay').classList.toggle('active');
-}
+function selectTheme(theme) {
+  settings.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  document.querySelectorAll('[data-theme-option]').forEach((option) => {
+    option.classList.toggle('active', option.dataset.themeOption === theme);
+  });
+  document.getElementById('sidebar-current-theme').textContent =
+    theme === 'orange' ? 'Orange' : theme === 'light' ? 'Light' : 'Dark';
+  localStorage.setItem('weather-theme', theme);
 
-// ─── Settings Toggle ──────────────────────────────────────────────────────
-function selectToggle(el, group) {
-  document.querySelectorAll(`.toggle-btn[data-group="${group}"]`).forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  settings[group] = el.dataset.val;
-  localStorage.setItem(`weather-${group}`, el.dataset.val);
-  
   if (globalWeatherData) {
     renderTodayHero();
     renderTodayChart();
@@ -679,231 +808,247 @@ function selectToggle(el, group) {
   }
 }
 
-// Load saved settings
-function loadSettings() {
-  ['temp', 'wind', 'time'].forEach(key => {
-    const saved = localStorage.getItem(`weather-${key}`);
-    if (saved) {
-      settings[key] = saved;
-      document.querySelectorAll(`.toggle-btn[data-group="${key}"]`).forEach(b => {
-        b.classList.toggle('active', b.dataset.val === saved);
-      });
-    }
+function loadTheme() {
+  selectTheme(localStorage.getItem('weather-theme') || 'orange');
+}
+
+function toggleSidebar(force) {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const open = typeof force === 'boolean' ? force : !sidebar.classList.contains('active');
+  sidebar.classList.toggle('active', open);
+  overlay.classList.toggle('active', open);
+}
+
+function toggleSidebarPanel(panel) {
+  document.querySelectorAll('.sidebar-section').forEach((section) => {
+    const shouldOpen = section.id === `sidebar-section-${panel}` && !section.classList.contains('open');
+    section.classList.toggle('open', shouldOpen);
   });
 }
 
-// ─── Search ───────────────────────────────────────────────────────────────
+function selectToggle(el, group) {
+  document.querySelectorAll(`.sidebar-option[data-group="${group}"]`).forEach((option) => {
+    option.classList.toggle('active', option === el);
+  });
+  settings[group] = el.dataset.val;
+  localStorage.setItem(`weather-${group}`, el.dataset.val);
+
+  if (group === 'temp') {
+    document.getElementById('sidebar-current-temp').textContent = el.dataset.val === 'F' ? 'Fahrenheit' : 'Celsius';
+  }
+  if (group === 'time') {
+    document.getElementById('sidebar-current-time').textContent = el.dataset.val === '24' ? '24 Hour' : '12 Hour';
+  }
+
+  if (globalWeatherData) {
+    renderTodayHero();
+    renderTodayChart();
+    renderForecastList();
+    if (expandedRow !== null) {
+      const rows = document.querySelectorAll('.forecast-row');
+      if (rows[expandedRow]) renderMiniChart(rows[expandedRow], expandedRow + 1);
+    }
+  }
+}
+
+function loadSettings() {
+  ['temp', 'time'].forEach((key) => {
+    const saved = localStorage.getItem(`weather-${key}`);
+    if (saved) settings[key] = saved;
+  });
+
+  document.querySelectorAll('.sidebar-option[data-group="temp"]').forEach((option) => {
+    option.classList.toggle('active', option.dataset.val === settings.temp);
+  });
+  document.querySelectorAll('.sidebar-option[data-group="time"]').forEach((option) => {
+    option.classList.toggle('active', option.dataset.val === settings.time);
+  });
+  document.getElementById('sidebar-current-temp').textContent = settings.temp === 'F' ? 'Fahrenheit' : 'Celsius';
+  document.getElementById('sidebar-current-time').textContent = settings.time === '24' ? '24 Hour' : '12 Hour';
+}
+
+function setSearchState(message) {
+  document.getElementById('search-results').innerHTML = message ? `<div class="search-state">${message}</div>` : '';
+}
+
 function openSearch() {
   document.getElementById('search-overlay').classList.add('active');
   setTimeout(() => document.getElementById('search-input').focus(), 50);
 }
+
 function closeSearch() {
   document.getElementById('search-overlay').classList.remove('active');
   document.getElementById('search-input').value = '';
-  document.getElementById('search-results').innerHTML = '';
+  setSearchState('');
 }
 
-let searchTimeout;
-document.getElementById('search-input').addEventListener('input', (e) => {
+document.getElementById('search-input').addEventListener('input', (event) => {
   clearTimeout(searchTimeout);
-  const query = e.target.value.trim();
-  if (query.length < 2) { document.getElementById('search-results').innerHTML = ''; return; }
+  const query = event.target.value.trim();
+  if (query.length < 2) {
+    setSearchState('');
+    return;
+  }
+
+  setSearchState('');
   searchTimeout = setTimeout(async () => {
     try {
-      const d = await jfetch(`${GEO_URL}?name=${encodeURIComponent(query)}&count=5&format=json`);
-      const res = d.results || [];
-      const html = res.map(r => `
-        <div class="search-item" onclick="selectCity(${r.latitude}, ${r.longitude}, '${r.name.replace(/'/g,"\\'")}')">
-          <div class="search-city">${r.name}</div>
-          <div class="search-country">${r.admin1 ? r.admin1 + ', ' : ''}${r.country || ''}</div>
-        </div>`).join('');
-      document.getElementById('search-results').innerHTML = html || '<div class="search-item">No results found</div>';
-    } catch { document.getElementById('search-results').innerHTML = '<div class="search-item">Error fetching data</div>'; }
-  }, 300);
+      const data = await jfetch(`${GEO_URL}?name=${encodeURIComponent(query)}&count=5&format=json`);
+      const results = data.results || [];
+      document.getElementById('search-results').innerHTML = results.length
+        ? results.map((result) => `
+            <div class="search-item" onclick="selectCity(${result.latitude}, ${result.longitude}, '${result.name.replace(/'/g, "\\'")}')">
+              <div class="search-city">${result.name}</div>
+              <div class="search-country">${result.admin1 ? result.admin1 + ', ' : ''}${result.country || ''}</div>
+            </div>`).join('')
+        : '<div class="search-state">No matches</div>';
+    } catch {
+      setSearchState('Unable to search');
+    }
+  }, 260);
 });
 
 function selectCity(lat, lon, name) {
+  isFirstLoad = false;
   closeSearch();
   fetchWeather(lat, lon, name);
 }
 
-// ─── Weather Helpers ──────────────────────────────────────────────────────
 function wmoLabel(code) {
-  if (code === 0) return 'Clear Sky';
-  if (code === 1) return 'Mostly Clear';
-  if (code === 2) return 'Partly Cloudy';
-  if (code === 3) return 'Overcast';
-  if (code <= 48) return 'Foggy';
+  if (code <= 1) return 'Clear';
+  if (code <= 3) return 'Cloudy';
+  if (code <= 48) return 'Fog';
   if (code <= 57) return 'Drizzle';
-  if (code <= 67) return 'Rainy';
-  if (code <= 77) return 'Snowy';
-  if (code <= 82) return 'Rain Showers';
-  if (code <= 86) return 'Snow Showers';
-  return 'Thunderstorms';
+  if (code <= 82) return 'Rain';
+  if (code <= 86) return 'Snow';
+  return 'Storm';
 }
 
-// Dynamic weather icon SVGs
 function wmoIcon(code) {
-  const c = 'currentColor';
-  const op = 'opacity="0.85"';
-
-  // ☀️ Sunny / Clear
-  if (code === 0 || code === 1) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none" class="sun-anim">
-      <circle cx="16" cy="16" r="7" fill="${c}" ${op}/>
-      <line x1="16" y1="1" x2="16" y2="5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="16" y1="27" x2="16" y2="31" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="1" y1="16" x2="5" y2="16" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="27" y1="16" x2="31" y2="16" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="5.5" y1="5.5" x2="8.3" y2="8.3" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="23.7" y1="23.7" x2="26.5" y2="26.5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="26.5" y1="5.5" x2="23.7" y2="8.3" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-      <line x1="8.3" y1="23.7" x2="5.5" y2="26.5" stroke="${c}" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-    </svg>`;
-
-  // ⛅ Partly Cloudy
-  if (code === 2) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <circle cx="13" cy="12" r="5" fill="${c}" opacity="0.5"/>
-      <line x1="13" y1="3" x2="13" y2="6" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
-      <line x1="5" y1="12" x2="8" y2="12" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
-      <line x1="6.8" y1="6.8" x2="9" y2="9" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
-      <line x1="19.2" y1="6.8" x2="17" y2="9" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
-      <rect x="5" y="17" width="22" height="10" rx="5" fill="${c}" ${op}/>
-      <circle cx="11" cy="17" r="5" fill="${c}" ${op}/>
-      <circle cx="20" cy="16" r="6" fill="${c}" ${op}/>
-    </svg>`;
-
-  // ☁️ Overcast
-  if (code === 3) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="4" y="18" width="24" height="10" rx="5" fill="${c}" ${op}/>
-      <circle cx="10" cy="18" r="6" fill="${c}" ${op}/>
-      <circle cx="20" cy="16" r="7" fill="${c}" ${op}/>
-      <circle cx="26" cy="19" r="5" fill="${c}" ${op}/>
-    </svg>`;
-
-  // 🌫️ Fog
-  if (code <= 48) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="4" y="8" width="24" height="3" rx="1.5" fill="${c}" opacity="0.35"/>
-      <rect x="2" y="14" width="28" height="3" rx="1.5" fill="${c}" opacity="0.55"/>
-      <rect x="6" y="20" width="20" height="3" rx="1.5" fill="${c}" opacity="0.35"/>
-      <rect x="4" y="26" width="24" height="3" rx="1.5" fill="${c}" opacity="0.25"/>
-    </svg>`;
-
-  // 🌧️ Drizzle
-  if (code <= 57) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="5" y="6" width="22" height="10" rx="5" fill="${c}" ${op}/>
-      <circle cx="11" cy="10" r="5" fill="${c}" ${op}/>
-      <circle cx="21" cy="8" r="6" fill="${c}" ${op}/>
-      <line x1="11" y1="20" x2="9" y2="27" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-      <line x1="18" y1="20" x2="16" y2="27" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-    </svg>`;
-
-  // 🌧️ Rain
-  if (code <= 67) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="5" y="5" width="22" height="10" rx="5" fill="${c}" ${op}/>
-      <circle cx="11" cy="9" r="5" fill="${c}" ${op}/>
-      <circle cx="21" cy="7" r="6" fill="${c}" ${op}/>
-      <line x1="9" y1="19" x2="7" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="16" y1="19" x2="14" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="23" y1="19" x2="21" y2="26" stroke="${c}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-    </svg>`;
-
-  // ❄️ Snow
-  if (code <= 77) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="5" y="5" width="22" height="9" rx="4.5" fill="${c}" ${op}/>
-      <circle cx="11" cy="9" r="5" fill="${c}" ${op}/>
-      <circle cx="21" cy="7" r="6" fill="${c}" ${op}/>
-      <circle cx="9" cy="22" r="2" fill="${c}" opacity="0.7"/>
-      <circle cx="16" cy="25" r="2" fill="${c}" opacity="0.7"/>
-      <circle cx="23" cy="21" r="2" fill="${c}" opacity="0.7"/>
-      <circle cx="13" cy="20" r="1.5" fill="${c}" opacity="0.5"/>
-      <circle cx="20" cy="23" r="1.5" fill="${c}" opacity="0.5"/>
-    </svg>`;
-
-  // 🌦️ Showers
-  if (code <= 82) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <circle cx="14" cy="11" r="5" fill="${c}" opacity="0.5"/>
-      <line x1="14" y1="2" x2="14" y2="5" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
-      <line x1="7" y1="11" x2="10" y2="11" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
-      <line x1="8" y1="6" x2="10.2" y2="8.2" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.4"/>
-      <rect x="7" y="15" width="18" height="8" rx="4" fill="${c}" ${op}/>
-      <circle cx="13" cy="15" r="4.5" fill="${c}" ${op}/>
-      <circle cx="21" cy="14" r="5.5" fill="${c}" ${op}/>
-      <line x1="12" y1="25" x2="10" y2="31" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
-      <line x1="19" y1="25" x2="17" y2="31" stroke="${c}" stroke-width="2" stroke-linecap="round" opacity="0.65"/>
-    </svg>`;
-
-  // 🌨️ Snow Showers
-  if (code <= 86) return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="6" y="7" width="20" height="9" rx="4.5" fill="${c}" ${op}/>
-      <circle cx="12" cy="10" r="4.5" fill="${c}" ${op}/>
-      <circle cx="21" cy="9" r="5.5" fill="${c}" ${op}/>
-      <circle cx="9" cy="23" r="2" fill="${c}" opacity="0.65"/>
-      <circle cx="16" cy="26" r="2" fill="${c}" opacity="0.65"/>
-      <circle cx="23" cy="22" r="2" fill="${c}" opacity="0.65"/>
-      <line x1="13" y1="21" x2="11" y2="27" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
-      <line x1="20" y1="21" x2="18" y2="27" stroke="${c}" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
-    </svg>`;
-
-  // ⛈️ Storms
+  const stroke = 'currentColor';
+  if (code <= 1) {
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" class="sun-anim">
+        <circle cx="16" cy="16" r="6" fill="${stroke}" opacity="0.9"/>
+        <circle cx="16" cy="16" r="11" stroke="${stroke}" stroke-opacity="0.3"/>
+      </svg>`;
+  }
+  if (code <= 3) {
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 21c0-3 2.4-5.5 5.4-5.5.8-3 3.2-5 6.3-5 3.6 0 6.3 2.8 6.3 6.4 2 0 3.6 1.6 3.6 3.6S28 24 26 24H10.2C9 24 8 22.9 8 21Z" fill="${stroke}" opacity="0.85"/>
+      </svg>`;
+  }
+  if (code <= 48) {
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M6 12h20M4 17h24M7 22h18" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+      </svg>`;
+  }
+  if (code <= 82) {
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+        <path d="M11 24l-1.5 4M17 24l-1.5 4M23 24l-1.5 4" stroke="${stroke}" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+      </svg>`;
+  }
+  if (code <= 86) {
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+        <circle cx="11" cy="26" r="1.4" fill="${stroke}" opacity="0.8"/>
+        <circle cx="17" cy="27" r="1.4" fill="${stroke}" opacity="0.8"/>
+        <circle cx="23" cy="25" r="1.4" fill="${stroke}" opacity="0.8"/>
+      </svg>`;
+  }
   return `
-    <svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <rect x="4" y="5" width="24" height="10" rx="5" fill="${c}" ${op}/>
-      <circle cx="10" cy="9" r="5" fill="${c}" ${op}/>
-      <circle cx="22" cy="7" r="6.5" fill="${c}" ${op}/>
-      <polyline points="18,17 13,24 17,24 12,31" stroke="${c}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+    <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+      <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+      <path d="M18 21l-4 5h3l-2 4" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
     </svg>`;
 }
 
-function cvtTemp(c) {
-  return settings.temp === 'F' ? Math.round(c * 9/5 + 32) : Math.round(c);
+function cvtTemp(celsius) {
+  return settings.temp === 'F' ? Math.round((celsius * 9 / 5) + 32) : Math.round(celsius);
 }
-function tempSuffix() { return settings.temp === 'F' ? '°F' : '°C'; }
 
 function fmtTime(dateStr) {
-  const d = new Date(dateStr);
+  const date = new Date(dateStr);
   if (settings.time === '24') {
-    return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
   }
-  let h = d.getHours() % 12 || 12;
-  const m = d.getMinutes();
-  const ap = d.getHours() >= 12 ? 'pm' : 'am';
-  return `${h}${m === 0 ? '' : ':' + String(m).padStart(2,'0')}${ap}`;
+  const hour = date.getHours() % 12 || 12;
+  const minutes = date.getMinutes();
+  const period = date.getHours() >= 12 ? 'pm' : 'am';
+  return `${hour}${minutes === 0 ? '' : ':' + String(minutes).padStart(2, '0')}${period}`;
 }
 
 function fmtHour(dateStr) {
-  const d = new Date(dateStr);
-  if (settings.time === '24') return String(d.getHours()).padStart(2,'0');
-  let h = d.getHours() % 12 || 12;
-  const ap = d.getHours() >= 12 ? 'pm' : 'am';
-  return `${h}${ap}`;
+  const date = new Date(dateStr);
+  if (settings.time === '24') return String(date.getHours()).padStart(2, '0');
+  const hour = date.getHours() % 12 || 12;
+  return `${hour}${date.getHours() >= 12 ? 'pm' : 'am'}`;
 }
 
 async function jfetch(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return await res.json();
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  return response.json();
 }
 
 async function revGeo(lat, lon) {
   try {
-    const d = await jfetch(`${NOM_URL}?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
-    const a = d.address || {};
-    return a.city || a.town || a.village || 'Local Area';
-  } catch { return 'Local Area'; }
+    const data = await jfetch(`${NOM_URL}?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+    const address = data.address || {};
+    return address.city || address.town || address.village || 'Local Area';
+  } catch {
+    return 'Local Area';
+  }
 }
 
-// ─── Fetch Weather ─────────────────────────────────────────────────────────
+function formatRelativeTime(timestamp) {
+  if (!timestamp) return 'Updated just now';
+  const diffMinutes = Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+  if (diffMinutes < 1) return 'Updated just now';
+  if (diffMinutes < 60) return `Updated ${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `Updated ${diffHours}h ago`;
+  return `Updated ${Math.round(diffHours / 24)}d ago`;
+}
+
+function setLiveState(state, meta) {
+  const live = document.getElementById('live-status');
+  const label = document.getElementById('live-status-label');
+  const details = document.getElementById('live-status-meta');
+  const labels = { syncing: 'Syncing', live: 'Live', updated: 'Updated', offline: 'Search' };
+
+  live.classList.remove('hidden', 'is-syncing', 'is-live', 'is-updated', 'is-offline');
+  live.classList.add(`is-${state}`);
+  label.textContent = labels[state] || 'Live';
+  details.textContent = meta || '';
+}
+
+function refreshLiveState() {
+  if (!lastUpdatedAt) {
+    setLiveState('offline', 'Search for a city');
+    return;
+  }
+  setLiveState((Date.now() - lastUpdatedAt) < LIVE_FRESH_WINDOW_MS ? 'live' : 'updated', formatRelativeTime(lastUpdatedAt));
+}
+
+function getDayHourIndices(dayIdx) {
+  const day = globalWeatherData.daily.time[dayIdx];
+  return globalWeatherData.hourly.time.reduce((indices, timestamp, index) => {
+    if (timestamp.startsWith(day)) indices.push(index);
+    return indices;
+  }, []);
+}
+
 async function fetchWeather(lat, lon, cityName) {
-  document.getElementById('display-city').textContent = cityName;
+  const startedAt = Date.now();
+  setLiveState('syncing', globalWeatherData ? 'Refreshing weather' : 'Loading weather');
+
   const params = new URLSearchParams({
     latitude: lat,
     longitude: lon,
@@ -913,125 +1058,105 @@ async function fetchWeather(lat, lon, cityName) {
     timezone: 'auto',
     forecast_days: 7
   });
+
   try {
-    globalWeatherData = await jfetch(`${WX_URL}?${params}`);
+    const weatherData = await jfetch(`${WX_URL}?${params}`);
+    const remainingDelay = Math.max(0, MIN_LOADING_MS - (Date.now() - startedAt));
+    if (remainingDelay) {
+      await new Promise((resolve) => setTimeout(resolve, remainingDelay));
+    }
+
+    globalWeatherData = weatherData;
     expandedRow = null;
+    lastUpdatedAt = Date.now();
+    document.getElementById('display-city').textContent = cityName;
     hideLocationStatus();
     renderTodayHero();
     renderTodayChart();
     renderForecastList();
-  } catch (e) {
-    showToast('⚠️', 'Network Error', 'Failed to fetch weather data.', null, null);
+    refreshLiveState();
+  } catch {
+    refreshLiveState();
+    showToast('ERR', 'Network Error', 'Failed to fetch weather data.', lastUpdatedAt ? null : 'Search', lastUpdatedAt ? null : openSearch);
   }
 }
 
-// ─── Render Today Hero ─────────────────────────────────────────────────────
 function renderTodayHero() {
-  const d = globalWeatherData;
-  document.getElementById('temp-current').textContent = cvtTemp(d.current.temperature_2m);
-  document.getElementById('temp-unit').textContent = '°';
-  document.getElementById('temp-low').textContent = cvtTemp(d.daily.temperature_2m_min[0]) + '°';
-  document.getElementById('live-badge').classList.remove('hidden');
+  const data = globalWeatherData;
+  document.getElementById('temp-current').textContent = cvtTemp(data.current.temperature_2m);
+  document.getElementById('temp-unit').innerHTML = '&deg;';
+  document.getElementById('temp-low').innerHTML = `${cvtTemp(data.daily.temperature_2m_min[0])}&deg;`;
 
-  // Get current hour's weather code for more accuracy
   const now = new Date();
-  const nowHourIdx = d.hourly.time.findIndex(t => new Date(t).getTime() > now.getTime()) - 1;
-  const currentCode = (nowHourIdx >= 0 && d.hourly.weather_code)
-    ? d.hourly.weather_code[nowHourIdx]
-    : d.current.weather_code;
+  const nowHourIdx = data.hourly.time.findIndex((timestamp) => new Date(timestamp).getTime() > now.getTime()) - 1;
+  const currentCode = nowHourIdx >= 0 ? data.hourly.weather_code[nowHourIdx] : data.current.weather_code;
 
   document.getElementById('condition').textContent = wmoLabel(currentCode);
   document.getElementById('weather-icon').innerHTML = wmoIcon(currentCode);
 }
 
-// ─── Build SVG Chart Path ──────────────────────────────────────────────────
-function buildChartPath(temps, svgW, svgH, padX, padY) {
-  const minT = Math.min(...temps);
-  const maxT = Math.max(...temps);
-  const range = maxT - minT || 1;
-  const pts = temps.map((t, i) => {
-    const x = padX + (i / (temps.length - 1)) * (svgW - padX * 2);
-    const y = svgH - padY - ((t - minT) / range) * (svgH - padY * 2);
+function buildChartPath(temps, svgWidth, svgHeight, padX, padY) {
+  const minTemp = Math.min(...temps);
+  const maxTemp = Math.max(...temps);
+  const range = maxTemp - minTemp || 1;
+  const points = temps.map((temp, index) => {
+    const x = padX + (index / (temps.length - 1)) * (svgWidth - (padX * 2));
+    const y = svgHeight - padY - ((temp - minTemp) / range) * (svgHeight - (padY * 2));
     return [x, y];
   });
-  
-  // Smooth curve via cubic bezier
-  let path = `M ${pts[0][0]} ${pts[0][1]}`;
-  for (let i = 1; i < pts.length; i++) {
-    const cp1x = pts[i-1][0] + (pts[i][0] - pts[i-1][0]) * 0.4;
-    const cp1y = pts[i-1][1];
-    const cp2x = pts[i][0] - (pts[i][0] - pts[i-1][0]) * 0.4;
-    const cp2y = pts[i][1];
-    path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${pts[i][0]} ${pts[i][1]}`;
+
+  let path = `M ${points[0][0]} ${points[0][1]}`;
+  for (let index = 1; index < points.length; index += 1) {
+    const prev = points[index - 1];
+    const next = points[index];
+    const cp1x = prev[0] + ((next[0] - prev[0]) * 0.4);
+    const cp2x = next[0] - ((next[0] - prev[0]) * 0.4);
+    path += ` C ${cp1x} ${prev[1]}, ${cp2x} ${next[1]}, ${next[0]} ${next[1]}`;
   }
-  return { path, pts, minT, maxT };
+
+  return { path, points, minTemp, maxTemp };
 }
 
-// ─── Render Today Chart with accurate live dot ────────────────────────────
 function renderTodayChart() {
-  const d = globalWeatherData;
+  if (!globalWeatherData) return;
+
+  const data = globalWeatherData;
   const svg = document.getElementById('today-chart-svg');
   const timeAxis = document.getElementById('time-axis');
+  const hours = getDayHourIndices(0).slice(0, 24);
+  if (!hours.length) return;
 
-  const today = d.daily.time[0];
-  const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
+  const temps = hours.map((idx) => cvtTemp(data.hourly.temperature_2m[idx]));
+  const displayIndices = [0, 4, 8, 12, 16, 20, 23].filter((index) => index < temps.length);
+  const displayTemps = displayIndices.map((index) => temps[index]);
+  const width = HERO_CHART_MIN_WIDTH;
+  const baselineY = 148;
+  const padX = 20;
+  const padY = 25;
   const now = new Date();
+  const { path, points } = buildChartPath(displayTemps, width, baselineY, padX, padY);
 
-  // Get all 24 hours of today for more accurate chart
-  const hours = [];
-  const temps = [];
-  for (let i = 0; i < 24; i++) {
-    if (startIdx + i < d.hourly.time.length) {
-      hours.push(startIdx + i);
-      temps.push(cvtTemp(d.hourly.temperature_2m[startIdx + i]));
-    }
-  }
+  const start = new Date(data.hourly.time[hours[0]]);
+  const end = new Date(data.hourly.time[hours[hours.length - 1]]);
+  const totalMs = Math.max(1, end - start);
+  const currentMs = Math.max(start.getTime(), Math.min(now.getTime(), end.getTime()));
+  const currentIndex = Math.min(hours.length - 1, Math.floor((currentMs - start.getTime()) / 3600000));
+  const currentFraction = Math.max(0, Math.min(1, ((currentMs - start.getTime()) % 3600000) / 3600000));
+  const currentTemp = currentIndex < temps.length - 1
+    ? temps[currentIndex] + ((temps[currentIndex + 1] - temps[currentIndex]) * currentFraction)
+    : temps[currentIndex];
+  const tempMin = Math.min(...temps);
+  const tempMax = Math.max(...temps);
+  const tempRange = tempMax - tempMin || 1;
+  const liveX = padX + (((currentMs - start.getTime()) / totalMs) * (width - (padX * 2)));
+  const liveY = baselineY - padY - (((currentTemp - tempMin) / tempRange) * (baselineY - (padY * 2)));
 
-  // Pick 7 evenly spaced points for display
-  const displayIndices = [0, 4, 8, 12, 16, 20, 23];
-  const displayTemps = displayIndices.map(i => temps[i] || temps[temps.length - 1]);
-  const timeLabels = displayIndices.map(i => fmtHour(d.hourly.time[hours[i]]));
-
-  const { path, pts } = buildChartPath(displayTemps, 358, 148, 20, 25);
-  
-  // Calculate real min/max from ALL hours for accurate positioning
-  const actualMinT = Math.min(...temps);
-  const actualMaxT = Math.max(...temps);
-  const actualRange = actualMaxT - actualMinT || 1;
-
-  // Live dot - precise positioning based on current time
-  const todayStart = new Date(d.hourly.time[hours[0]]);
-  const todayEnd = new Date(d.hourly.time[hours[23]] || d.hourly.time[hours[hours.length - 1]]);
-  const totalMs = todayEnd - todayStart;
-  const elapsedMs = Math.max(0, Math.min(totalMs, now - todayStart));
-  const nowFrac = elapsedMs / totalMs;
-  const liveX = 20 + nowFrac * (358 - 40);
-
-  // Interpolate temperature at current time
-  const hoursSinceStart = elapsedMs / (1000 * 60 * 60);
-  const hourIndex = Math.floor(hoursSinceStart);
-  const hourFraction = hoursSinceStart - hourIndex;
-  let liveTemp;
-  
-  if (hourIndex < temps.length - 1) {
-    liveTemp = temps[hourIndex] + (temps[hourIndex + 1] - temps[hourIndex]) * hourFraction;
-  } else {
-    liveTemp = temps[temps.length - 1];
-  }
-  
-  const liveY = 148 - 25 - ((liveTemp - actualMinT) / actualRange) * (148 - 50);
-
-  // Sunrise/sunset lines
-  const sr = new Date(d.daily.sunrise[0]);
-  const ss = new Date(d.daily.sunset[0]);
-  const srFrac = Math.max(0, Math.min(1, (sr - todayStart) / totalMs));
-  const ssFrac = Math.max(0, Math.min(1, (ss - todayStart) / totalMs));
-  const srX = 20 + srFrac * (358 - 40);
-  const ssX = 20 + ssFrac * (358 - 40);
-
-  // Get theme-aware colors
   const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
   const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--live-dot').trim();
+  const sunrise = new Date(data.daily.sunrise[0]);
+  const sunset = new Date(data.daily.sunset[0]);
+  const sunriseX = padX + (Math.max(0, Math.min(1, (sunrise - start) / totalMs)) * (width - (padX * 2)));
+  const sunsetX = padX + (Math.max(0, Math.min(1, (sunset - start) / totalMs)) * (width - (padX * 2)));
 
   svg.innerHTML = `
     <defs>
@@ -1040,144 +1165,160 @@ function renderTodayChart() {
         <stop offset="100%" style="stop-color:${lineColor};stop-opacity:0.02" />
       </linearGradient>
     </defs>
-    <line x1="6" y1="148" x2="352" y2="148" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.12"/>
-    <line x1="${srX}" y1="14" x2="${srX}" y2="148" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
-    <text x="${srX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(d.daily.sunrise[0])}</text>
-    <line x1="${ssX}" y1="14" x2="${ssX}" y2="148" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
-    <text x="${ssX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(d.daily.sunset[0])}</text>
-    <path d="${path} L ${pts[pts.length-1][0]} 148 L ${pts[0][0]} 148 Z" fill="url(#tempGrad)"/>
+    <line x1="6" y1="${baselineY}" x2="${width - 6}" y2="${baselineY}" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.12"/>
+    <line x1="${sunriseX}" y1="14" x2="${sunriseX}" y2="${baselineY}" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${sunriseX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(data.daily.sunrise[0])}</text>
+    <line x1="${sunsetX}" y1="14" x2="${sunsetX}" y2="${baselineY}" stroke="${lineColor}" stroke-width="1.2" stroke-opacity="0.22" stroke-dasharray="3,4"/>
+    <text x="${sunsetX}" y="162" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.45">${fmtTime(data.daily.sunset[0])}</text>
+    <path d="${path} L ${points[points.length - 1][0]} ${baselineY} L ${points[0][0]} ${baselineY} Z" fill="url(#tempGrad)"/>
     <path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2.2" stroke-opacity="0.75" stroke-linecap="round"/>
-    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[i]}°</text>`).join('')}
+    ${points.map((point, index) => `<text x="${point[0]}" y="${point[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[index]}&deg;</text>`).join('')}
     <circle cx="${liveX}" cy="${liveY}" r="10" fill="${dotColor}" opacity="0.08"/>
     <circle cx="${liveX}" cy="${liveY}" r="5" fill="${dotColor}" opacity="0.85"/>
-    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(liveTemp)}°</text>
+    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(currentTemp)}&deg;</text>
   `;
 
-  timeAxis.innerHTML = timeLabels.map(l => `<span class="time-tick">${l}</span>`).join('');
+  timeAxis.innerHTML = displayIndices.map((index) => `<span class="time-tick">${fmtHour(data.hourly.time[hours[index]])}</span>`).join('');
 }
 
-// ─── Render Forecast List ─────────────────────────────────────────────────
 function renderForecastList() {
-  const d = globalWeatherData;
-  const container = document.getElementById('forecast-container');
-  container.innerHTML = '';
-  const daysShort = ['SU','MO','TU','WE','TH','FR','SA'];
+  if (!globalWeatherData) return;
 
-  for (let i = 1; i <= 5; i++) {
-    const fDate = new Date(d.daily.time[i]);
+  const data = globalWeatherData;
+  const container = document.getElementById('forecast-container');
+  const daysShort = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+  container.innerHTML = '';
+
+  for (let dayIndex = 1; dayIndex <= 5; dayIndex += 1) {
+    const date = new Date(data.daily.time[dayIndex]);
     const row = document.createElement('div');
     row.className = 'forecast-row';
-    row.dataset.dayIdx = i;
-
     row.innerHTML = `
       <div class="forecast-row-header">
         <div class="forecast-day-header">
-          <div class="forecast-dot">${i === 1 ? 'TM' : daysShort[fDate.getDay()]}</div>
-          <div class="forecast-date">${fDate.toLocaleDateString('en-US', {weekday:'long', month:'short', day:'2-digit'})}</div>
+          <div class="forecast-dot">${dayIndex === 1 ? 'TM' : daysShort[date.getDay()]}</div>
+          <div class="forecast-date">${date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: '2-digit' })}</div>
         </div>
-        <div class="forecast-condition">${cvtTemp(d.daily.temperature_2m_max[i])}° ${wmoLabel(d.daily.weather_code[i])}</div>
-        <div class="forecast-sub">${cvtTemp(d.daily.temperature_2m_min[i])}° Low</div>
+        <div class="forecast-condition">${cvtTemp(data.daily.temperature_2m_max[dayIndex])}&deg; ${wmoLabel(data.daily.weather_code[dayIndex])}</div>
+        <div class="forecast-sub">${cvtTemp(data.daily.temperature_2m_min[dayIndex])}&deg; Low</div>
       </div>
       <div class="forecast-expand">
         <div class="mini-chart-wrap">
           <svg class="mini-chart-svg" viewBox="0 0 320 90" xmlns="http://www.w3.org/2000/svg"></svg>
           <div class="mini-time-axis"></div>
         </div>
-      </div>
-    `;
+      </div>`;
 
-    row.addEventListener('click', () => toggleForecastRow(row, i));
+    row.addEventListener('click', () => {
+      const isOpen = row.classList.contains('expanded');
+      document.querySelectorAll('.forecast-row.expanded').forEach((item) => item.classList.remove('expanded'));
+      if (!isOpen) {
+        row.classList.add('expanded');
+        expandedRow = dayIndex - 1;
+        renderMiniChart(row, dayIndex);
+      } else {
+        expandedRow = null;
+      }
+    });
+
     container.appendChild(row);
   }
 }
 
-// ─── Toggle Expand/Collapse Forecast Row ──────────────────────────────────
-function toggleForecastRow(row, dayIdx) {
-  const isOpen = row.classList.contains('expanded');
-  document.querySelectorAll('.forecast-row.expanded').forEach(r => r.classList.remove('expanded'));
-  if (!isOpen) {
-    row.classList.add('expanded');
-    expandedRow = dayIdx - 1;
-    renderMiniChart(row, dayIdx);
-  } else {
-    expandedRow = null;
-  }
-}
-
-// ─── Render Mini Chart ─────────────────────────────────────────────────────
 function renderMiniChart(row, dayIdx) {
-  const d = globalWeatherData;
   const svg = row.querySelector('.mini-chart-svg');
   const axis = row.querySelector('.mini-time-axis');
-  const today = d.daily.time[dayIdx];
-  const startIdx = d.hourly.time.findIndex(t => t.startsWith(today));
-
-  const step = 3;
-  const hours = [];
-  for (let i = 0; i < 7; i++) hours.push(startIdx + i * step);
-
-  const temps = hours.map(idx => cvtTemp(d.hourly.temperature_2m[idx]));
-  const timeLabels = hours.map(idx => fmtHour(d.hourly.time[idx]));
-
-  const { path, pts } = buildChartPath(temps, 320, 82, 16, 14);
-  
+  const hours = getDayHourIndices(dayIdx).slice(0, 24);
+  const step = 4;
+  const sampled = hours.filter((_, index) => index % step === 0 || index === hours.length - 1);
+  const temps = sampled.map((idx) => cvtTemp(globalWeatherData.hourly.temperature_2m[idx]));
+  const labels = sampled.map((idx) => fmtHour(globalWeatherData.hourly.time[idx]));
+  const { path, points } = buildChartPath(temps, 320, 82, 16, 14);
   const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
 
   svg.innerHTML = `
     <line x1="4" y1="82" x2="316" y2="82" stroke="${lineColor}" stroke-width="1" stroke-opacity="0.12"/>
     <path d="${path}" fill="none" stroke="${lineColor}" stroke-width="2" stroke-opacity="0.7" stroke-linecap="round"/>
-    ${pts.map((p,i) => `<text x="${p[0]}" y="${p[1]-6}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.65">${temps[i]}°</text>`).join('')}
-  `;
-  axis.innerHTML = timeLabels.map(l => `<span class="mini-time-tick">${l}</span>`).join('');
+    ${points.map((point, index) => `<text x="${point[0]}" y="${point[1] - 6}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="700" fill="${lineColor}" opacity="0.65">${temps[index]}&deg;</text>`).join('')}`;
+  axis.innerHTML = labels.map((label) => `<span class="mini-time-tick">${label}</span>`).join('');
 }
 
-// ─── Location Status ────────────────────────────────────────────────────────
-function showLocationStatus(msg) {
-  const el = document.getElementById('location-status');
-  document.getElementById('location-status-text').textContent = msg;
-  el.classList.add('visible');
+function showLocationStatus(message) {
+  if (!message) return;
+  const status = document.getElementById('location-status');
+  document.getElementById('location-status-text').textContent = message;
+  status.classList.add('visible');
 }
+
 function hideLocationStatus() {
   document.getElementById('location-status').classList.remove('visible');
 }
 
-// ─── GPS Location ─────────────────────────────────────────────────────────
-let isFirstLoad = true;
-document.getElementById('btn-gps').addEventListener('click', () => {
-  document.getElementById('display-city').textContent = 'Locating...';
-  hideLocationStatus();
+function requestLocation() {
   if (!navigator.geolocation) {
-    document.getElementById('display-city').textContent = 'Weather';
-    showLocationStatus('Location not supported — search a city to get started');
-    if (isFirstLoad) { isFirstLoad = false; openSearch(); }
+    if (!globalWeatherData) document.getElementById('display-city').textContent = 'Weather';
+    if (isFirstLoad) openSearch();
+    isFirstLoad = false;
+    hideLocationStatus();
+    refreshLiveState();
     return;
   }
+
+  hideLocationStatus();
+  setLiveState('syncing', globalWeatherData ? 'Refreshing location' : 'Finding your weather');
+
+  clearTimeout(initialSearchTimer);
+  if (isFirstLoad) {
+    initialSearchTimer = setTimeout(() => {
+      if (!globalWeatherData) openSearch();
+    }, 900);
+  }
+
   navigator.geolocation.getCurrentPosition(
-    async pos => {
+    async (position) => {
+      clearTimeout(initialSearchTimer);
       isFirstLoad = false;
-      const loc = await revGeo(pos.coords.latitude, pos.coords.longitude);
-      fetchWeather(pos.coords.latitude, pos.coords.longitude, loc);
+      const locationName = await revGeo(position.coords.latitude, position.coords.longitude);
+      closeSearch();
+      fetchWeather(position.coords.latitude, position.coords.longitude, locationName);
     },
-    (err) => {
-      document.getElementById('display-city').textContent = 'Weather';
-      if (err.code === 1) {
-        showLocationStatus('Unable to fetch current location — search a city to get started');
-        if (isFirstLoad) { isFirstLoad = false; openSearch(); }
-      } else {
-        showLocationStatus('Location unavailable — search a city to get started');
-        if (isFirstLoad) { isFirstLoad = false; openSearch(); }
-      }
+    () => {
+      clearTimeout(initialSearchTimer);
+      if (!globalWeatherData) document.getElementById('display-city').textContent = 'Weather';
+      if (isFirstLoad) openSearch();
+      isFirstLoad = false;
+      hideLocationStatus();
+      refreshLiveState();
     },
-    { timeout: 8000, maximumAge: 60000 }
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
   );
+}
+
+document.getElementById('btn-gps').addEventListener('click', () => requestLocation());
+document.getElementById('sidebar-overlay').addEventListener('click', () => toggleSidebar(false));
+document.getElementById('search-overlay').addEventListener('click', (event) => {
+  if (event.target.id === 'search-overlay') closeSearch();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    closeSearch();
+    toggleSidebar(false);
+  }
 });
 
-// ─── Init ─────────────────────────────────────────────────────────────────
 window.onload = () => {
   loadTheme();
   loadSettings();
-  document.getElementById('btn-gps').click();
+  setSearchState('');
+  refreshLiveState();
+  requestLocation();
+  setInterval(refreshLiveState, 60000);
 };
 </script>
 </body>
 </html>
+
+
+
+
+
