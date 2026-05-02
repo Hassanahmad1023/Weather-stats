@@ -1145,11 +1145,11 @@ function renderTodayChart() {
   const currentTemp = currentIndex < temps.length - 1
     ? temps[currentIndex] + ((temps[currentIndex + 1] - temps[currentIndex]) * currentFraction)
     : temps[currentIndex];
-  const tempMin = Math.min(...temps);
-  const tempMax = Math.max(...temps);
-  const tempRange = tempMax - tempMin || 1;
+const displayTempMin = Math.min(...displayTemps);
+  const displayTempMax = Math.max(...displayTemps);
+  const displayTempRange = displayTempMax - displayTempMin || 1;
   const liveX = padX + (((currentMs - start.getTime()) / totalMs) * (width - (padX * 2)));
-  const liveY = baselineY - padY - (((currentTemp - tempMin) / tempRange) * (baselineY - (padY * 2)));
+  const liveY = baselineY - padY - (((currentTemp - displayTempMin) / displayTempRange) * (baselineY - (padY * 2)));
 
   const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
   const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--live-dot').trim();
@@ -1175,7 +1175,6 @@ function renderTodayChart() {
     ${points.map((point, index) => `<text x="${point[0]}" y="${point[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[index]}&deg;</text>`).join('')}
     <circle cx="${liveX}" cy="${liveY}" r="10" fill="${dotColor}" opacity="0.08"/>
     <circle cx="${liveX}" cy="${liveY}" r="5" fill="${dotColor}" opacity="0.85"/>
-    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(currentTemp)}&deg;</text>
   `;
 
   timeAxis.innerHTML = displayIndices.map((index) => `<span class="time-tick">${fmtHour(data.hourly.time[hours[index]])}</span>`).join('');
