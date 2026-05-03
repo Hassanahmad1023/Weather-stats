@@ -360,7 +360,7 @@
   .header-left { display: flex; align-items: flex-start; gap: 16px; }
   .menu-btn { margin-top: 4px; }
   .city-name { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; color: var(--text); }
-  .header-actions { display: flex; gap: 6px; margin-top: 8px; }
+  .header-actions { display: flex; gap: 6px; margin-top: 8px; position: relative; }
   .icon-btn {
     width: 28px; height: 28px; border-radius: 6px;
     background: var(--surface-hover); display: flex; align-items: center; justify-content: center;
@@ -371,6 +371,48 @@
     transform: scale(1.1);
   }
   .icon-btn:hover svg { stroke: var(--bg); }
+  /* 3-dot dropdown */
+  .dots-menu { position: relative; }
+  .dots-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--surface);
+    border: 1px solid var(--divider);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    min-width: 160px;
+    z-index: 900;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px) scale(0.97);
+    transform-origin: top left;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .dots-dropdown.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+  .dots-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.14s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    font-family: inherit;
+    text-align: left;
+  }
+  .dots-dropdown-item:hover { background: var(--surface-hover); }
+  .dots-dropdown-item svg { flex-shrink: 0; opacity: 0.7; }
   .live-status {
     min-width: 108px;
     padding-top: 2px;
@@ -402,39 +444,34 @@
     color: var(--text-muted);
   }
   .live-status-indicator {
-    width: 18px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
     position: relative;
     display: inline-flex;
     align-items: center;
-    justify-content: space-between;
-  }
-  .live-status-dot,
-  .live-status-bar {
-    border-radius: 50%;
-    background: var(--live-dot);
+    justify-content: center;
     flex-shrink: 0;
   }
   .live-status-dot {
     width: 8px;
     height: 8px;
+    border-radius: 50%;
+    background: var(--live-dot);
+    flex-shrink: 0;
     animation: pulse 1.8s ease-in-out infinite;
   }
-  .live-status-bars {
+  .live-status-spinner {
     display: none;
-    width: 18px;
-    height: 10px;
-    align-items: flex-end;
-    gap: 2px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid transparent;
+    border-top-color: var(--live-dot);
+    border-right-color: var(--live-dot);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    opacity: 0.85;
   }
-  .live-status-bar {
-    width: 4px;
-    animation: liveBars 0.9s ease-in-out infinite;
-  }
-  .live-status-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
-  .live-status-bar:nth-child(2) { height: 8px; animation-delay: 0.1s; }
-  .live-status-bar:nth-child(3) { height: 6px; animation-delay: 0.2s; }
-  .live-status.is-syncing .live-status-bars { display: inline-flex; }
+  .live-status.is-syncing .live-status-spinner { display: block; }
   .live-status.is-syncing .live-status-dot { display: none; }
   .live-status.is-live .live-status-dot { opacity: 1; }
   .live-status.is-updated .live-status-dot,
@@ -442,20 +479,39 @@
 
   /* â”€â”€â”€ Hero (today only) â”€â”€â”€ */
   .temp-section { 
-    padding: 24px 24px 0; 
+    padding: 28px 24px 0; 
     display: flex; 
     align-items: flex-start; 
-    gap: 14px; 
+    gap: 18px; 
     animation: fadeUp 0.5s ease 0.1s both; 
   }
-  .sun-icon { margin-top: 10px; flex-shrink: 0; }
+  .sun-icon { 
+    margin-top: 8px; 
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    background: var(--surface-hover);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .sun-icon svg { stroke: var(--text); fill: var(--text); }
   .temp-row { display: flex; align-items: baseline; line-height: 1; }
-  .temp-current { font-size: 76px; font-weight: 900; letter-spacing: -5px; line-height: 1; transition: opacity 0.3s; color: var(--text); }
-  .temp-unit { font-size: 30px; font-weight: 700; letter-spacing: -1px; margin-top: 8px; color: var(--text); }
-  .temp-divider { font-size: 22px; font-weight: 400; color: var(--text-muted); margin: 0 5px; margin-top: 16px; }
-  .temp-low { font-size: 22px; font-weight: 500; color: var(--text-muted); margin-top: 16px; transition: opacity 0.3s; }
-  .condition { font-size: 36px; font-weight: 800; letter-spacing: -1px; margin-top: -4px; transition: opacity 0.3s; color: var(--text); }
+  .temp-current { font-size: 80px; font-weight: 900; letter-spacing: -6px; line-height: 1; transition: opacity 0.3s; color: var(--text); }
+  .temp-unit { font-size: 32px; font-weight: 700; letter-spacing: -1px; margin-top: 10px; color: var(--text); }
+  .temp-range {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-top: 14px;
+    margin-left: 4px;
+  }
+  .temp-high { font-size: 19px; font-weight: 700; color: var(--text); opacity: 0.65; }
+  .temp-divider { font-size: 16px; font-weight: 400; color: var(--text-muted); }
+  .temp-low { font-size: 19px; font-weight: 600; color: var(--text-muted); transition: opacity 0.3s; }
+  .condition { font-size: 34px; font-weight: 800; letter-spacing: -0.8px; margin-top: 2px; transition: opacity 0.3s; color: var(--text); }
+  .feels-like { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 5px; letter-spacing: 0.1px; }
 
   /* â”€â”€â”€ Today's Chart â”€â”€â”€ */
   .chart-section { padding: 6px 16px 0; animation: fadeUp 0.5s ease 0.25s both; }
@@ -517,10 +573,8 @@
   .mini-time-tick { font-size: 10px; font-weight: 600; color: var(--text-muted); text-align: center; width: 28px; }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-  @keyframes liveBars {
-    0%, 100% { transform: scaleY(0.55); opacity: 0.4; }
-    50% { transform: scaleY(1); opacity: 1; }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   @keyframes pulse-glow { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.75; transform: scale(1.06); } }
   .sun-anim { animation: pulse-glow 3s ease-in-out infinite; transform-origin: center; }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
@@ -687,11 +741,24 @@
       <div>
         <div class="city-name" id="display-city">Weather</div>
         <div class="header-actions">
-          <div class="icon-btn" id="btn-gps" title="Use GPS Location">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-          </div>
-          <div class="icon-btn" onclick="openSearch()" title="Search City">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+          <div class="dots-menu">
+            <div class="icon-btn" id="btn-dots" onclick="toggleDotsMenu(event)" title="Options">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="5" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+                <circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div class="dots-dropdown" id="dots-dropdown">
+              <button class="dots-dropdown-item" onclick="dotsAction('gps')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+                Use My Location
+              </button>
+              <button class="dots-dropdown-item" onclick="dotsAction('search')">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+                Search City
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -700,11 +767,7 @@
       <div class="live-status-head">
         <span class="live-status-indicator">
           <span class="live-status-dot"></span>
-          <span class="live-status-bars">
-            <span class="live-status-bar"></span>
-            <span class="live-status-bar"></span>
-            <span class="live-status-bar"></span>
-          </span>
+          <span class="live-status-spinner"></span>
         </span>
         <span id="live-status-label">Live</span>
       </div>
@@ -726,11 +789,15 @@
     <div>
       <div class="temp-row">
         <span class="temp-current" id="temp-current">--</span>
-        <span class="temp-unit" id="temp-unit">Â°</span>
-        <span class="temp-divider">/</span>
-        <span class="temp-low" id="temp-low">--Â°</span>
+        <span class="temp-unit">°</span>
+        <span class="temp-range">
+          <span class="temp-high" id="temp-high">--°</span>
+          <span class="temp-divider">/</span>
+          <span class="temp-low" id="temp-low">--°</span>
+        </span>
       </div>
       <div class="condition" id="condition">--</div>
+      <div class="feels-like" id="feels-like"></div>
     </div>
   </div>
 
@@ -926,63 +993,47 @@ function wmoLabel(code) {
 }
 
 function wmoIcon(code) {
-  const s = 'currentColor';
+  const stroke = 'currentColor';
   if (code <= 1) {
-    // Sun with rays
-    return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none" class="sun-anim">
-      <circle cx="16" cy="16" r="5.5" fill="${s}" opacity="0.9"/>
-      <line x1="16" y1="3" x2="16" y2="7" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="16" y1="25" x2="16" y2="29" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="3" y1="16" x2="7" y2="16" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="25" y1="16" x2="29" y2="16" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
-      <line x1="6.8" y1="6.8" x2="9.7" y2="9.7" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-      <line x1="22.3" y1="22.3" x2="25.2" y2="25.2" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-      <line x1="25.2" y1="6.8" x2="22.3" y2="9.7" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-      <line x1="9.7" y1="22.3" x2="6.8" y2="25.2" stroke="${s}" stroke-width="2.2" stroke-linecap="round" opacity="0.55"/>
-    </svg>`;
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none" class="sun-anim">
+        <circle cx="16" cy="16" r="6" fill="${stroke}" opacity="0.9"/>
+        <circle cx="16" cy="16" r="11" stroke="${stroke}" stroke-opacity="0.3"/>
+      </svg>`;
   }
   if (code <= 3) {
-    // Partly cloudy — sun peeking behind cloud
-    return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <circle cx="13" cy="13" r="4.5" fill="${s}" opacity="0.7"/>
-      <line x1="13" y1="5" x2="13" y2="7.5" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      <line x1="5" y1="13" x2="7.5" y2="13" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      <line x1="7.5" y1="7.5" x2="9.3" y2="9.3" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.4"/>
-      <path d="M11 23c0-2.8 2.2-5 5-5 .7-2.5 2.8-4.2 5.5-4.2 3.2 0 5.5 2.5 5.5 5.6 1.7 0 3 1.4 3 3S28.7 25.5 27 25.5H13.2C12 25.5 11 24.4 11 23Z" fill="${s}" opacity="0.9"/>
-    </svg>`;
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 21c0-3 2.4-5.5 5.4-5.5.8-3 3.2-5 6.3-5 3.6 0 6.3 2.8 6.3 6.4 2 0 3.6 1.6 3.6 3.6S28 24 26 24H10.2C9 24 8 22.9 8 21Z" fill="${stroke}" opacity="0.85"/>
+      </svg>`;
   }
   if (code <= 48) {
-    // Fog / mist — horizontal lines
-    return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <path d="M6 11c0-2.5 2-4.5 4.5-4.5.6-2.2 2.6-3.7 5-3.7 2.8 0 5 2.2 5 5 1.6 0 2.8 1.2 2.8 2.8S22.1 13 20.5 13H8.7C7.2 13 6 11.9 6 11Z" fill="${s}" opacity="0.7"/>
-      <line x1="4" y1="18" x2="28" y2="18" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-      <line x1="7" y1="23" x2="25" y2="23" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.35"/>
-      <line x1="10" y1="28" x2="22" y2="28" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.2"/>
-    </svg>`;
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M6 12h20M4 17h24M7 22h18" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" opacity="0.75"/>
+      </svg>`;
   }
   if (code <= 82) {
-    // Rain — cloud + rain drops
-    return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <path d="M7 17c0-2.8 2.2-5 5-5 .7-2.5 2.8-4.2 5.5-4.2 3.2 0 5.5 2.5 5.5 5.6 1.7 0 3 1.4 3 3S28.7 19.5 27 19.5H9.2C8 19.5 7 18.4 7 17Z" fill="${s}" opacity="0.85"/>
-      <line x1="10" y1="23" x2="8.5" y2="28" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-      <line x1="17" y1="23" x2="15.5" y2="28" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-      <line x1="24" y1="23" x2="22.5" y2="28" stroke="${s}" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
-    </svg>`;
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+        <path d="M11 24l-1.5 4M17 24l-1.5 4M23 24l-1.5 4" stroke="${stroke}" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+      </svg>`;
   }
   if (code <= 86) {
-    // Snow — cloud + snowflake dots
-    return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-      <path d="M7 17c0-2.8 2.2-5 5-5 .7-2.5 2.8-4.2 5.5-4.2 3.2 0 5.5 2.5 5.5 5.6 1.7 0 3 1.4 3 3S28.7 19.5 27 19.5H9.2C8 19.5 7 18.4 7 17Z" fill="${s}" opacity="0.85"/>
-      <circle cx="10" cy="25" r="1.6" fill="${s}" opacity="0.75"/>
-      <circle cx="17" cy="27" r="1.6" fill="${s}" opacity="0.75"/>
-      <circle cx="24" cy="25" r="1.6" fill="${s}" opacity="0.75"/>
-    </svg>`;
+    return `
+      <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+        <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+        <circle cx="11" cy="26" r="1.4" fill="${stroke}" opacity="0.8"/>
+        <circle cx="17" cy="27" r="1.4" fill="${stroke}" opacity="0.8"/>
+        <circle cx="23" cy="25" r="1.4" fill="${stroke}" opacity="0.8"/>
+      </svg>`;
   }
-  // Storm — cloud + lightning bolt
-  return `<svg width="36" height="36" viewBox="0 0 32 32" fill="none">
-    <path d="M7 17c0-2.8 2.2-5 5-5 .7-2.5 2.8-4.2 5.5-4.2 3.2 0 5.5 2.5 5.5 5.6 1.7 0 3 1.4 3 3S28.7 19.5 27 19.5H9.2C8 19.5 7 18.4 7 17Z" fill="${s}" opacity="0.85"/>
-    <path d="M18 20l-5 6h4l-3 6" stroke="${s}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
-  </svg>`;
+  return `
+    <svg width="34" height="34" viewBox="0 0 32 32" fill="none">
+      <path d="M8 18c0-2.8 2.2-5.1 5-5.1.7-2.6 2.9-4.3 5.7-4.3 3.2 0 5.7 2.5 5.7 5.8 1.8 0 3.3 1.4 3.3 3.2S26.2 21 24.4 21H10.8C9.3 21 8 19.8 8 18Z" fill="${stroke}" opacity="0.85"/>
+      <path d="M18 21l-4 5h3l-2 4" stroke="${stroke}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+    </svg>`;
 }
 
 function cvtTemp(celsius) {
@@ -1100,8 +1151,13 @@ async function fetchWeather(lat, lon, cityName) {
 function renderTodayHero() {
   const data = globalWeatherData;
   document.getElementById('temp-current').textContent = cvtTemp(data.current.temperature_2m);
-  document.getElementById('temp-unit').innerHTML = '&deg;';
+  document.getElementById('temp-high').innerHTML = `${cvtTemp(data.daily.temperature_2m_max[0])}&deg;`;
   document.getElementById('temp-low').innerHTML = `${cvtTemp(data.daily.temperature_2m_min[0])}&deg;`;
+
+  const feelsLike = data.current.apparent_temperature;
+  if (feelsLike !== undefined && feelsLike !== null) {
+    document.getElementById('feels-like').textContent = `Feels like ${cvtTemp(feelsLike)}°`;
+  }
 
   const now = new Date();
   const nowHourIdx = data.hourly.time.findIndex((timestamp) => new Date(timestamp).getTime() > now.getTime()) - 1;
@@ -1161,11 +1217,11 @@ function renderTodayChart() {
   const currentTemp = currentIndex < temps.length - 1
     ? temps[currentIndex] + ((temps[currentIndex + 1] - temps[currentIndex]) * currentFraction)
     : temps[currentIndex];
-const displayTempMin = Math.min(...displayTemps);
-  const displayTempMax = Math.max(...displayTemps);
-  const displayTempRange = displayTempMax - displayTempMin || 1;
+  const tempMin = Math.min(...temps);
+  const tempMax = Math.max(...temps);
+  const tempRange = tempMax - tempMin || 1;
   const liveX = padX + (((currentMs - start.getTime()) / totalMs) * (width - (padX * 2)));
-  const liveY = baselineY - padY - (((currentTemp - displayTempMin) / displayTempRange) * (baselineY - (padY * 2)));
+  const liveY = baselineY - padY - (((currentTemp - tempMin) / tempRange) * (baselineY - (padY * 2)));
 
   const lineColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-line').trim();
   const dotColor = getComputedStyle(document.documentElement).getPropertyValue('--live-dot').trim();
@@ -1191,6 +1247,7 @@ const displayTempMin = Math.min(...displayTemps);
     ${points.map((point, index) => `<text x="${point[0]}" y="${point[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[index]}&deg;</text>`).join('')}
     <circle cx="${liveX}" cy="${liveY}" r="10" fill="${dotColor}" opacity="0.08"/>
     <circle cx="${liveX}" cy="${liveY}" r="5" fill="${dotColor}" opacity="0.85"/>
+    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(currentTemp)}&deg;</text>
   `;
 
   timeAxis.innerHTML = displayIndices.map((index) => `<span class="time-tick">${fmtHour(data.hourly.time[hours[index]])}</span>`).join('');
@@ -1309,7 +1366,20 @@ function requestLocation() {
   );
 }
 
-document.getElementById('btn-gps').addEventListener('click', () => requestLocation());
+// 3-dot menu
+function toggleDotsMenu(e) {
+  e.stopPropagation();
+  document.getElementById('dots-dropdown').classList.toggle('open');
+}
+function dotsAction(action) {
+  document.getElementById('dots-dropdown').classList.remove('open');
+  if (action === 'gps') requestLocation();
+  else if (action === 'search') openSearch();
+}
+document.addEventListener('click', () => {
+  document.getElementById('dots-dropdown').classList.remove('open');
+});
+
 document.getElementById('sidebar-overlay').addEventListener('click', () => toggleSidebar(false));
 document.getElementById('search-overlay').addEventListener('click', (event) => {
   if (event.target.id === 'search-overlay') closeSearch();
@@ -1332,8 +1402,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
-
-
-
