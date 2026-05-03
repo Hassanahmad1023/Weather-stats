@@ -642,6 +642,24 @@
         <button class="sidebar-option" type="button" data-group="time" data-val="24" onclick="selectToggle(this, 'time')">24 Hour</button>
       </div>
     </div>
+
+    <div class="sidebar-section sidebar-section-location">
+      <button class="sidebar-trigger" type="button" onclick="requestLocation(); toggleSidebar();">
+        <span class="sidebar-trigger-label">Use My Location</span>
+        <span class="sidebar-trigger-meta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.5"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        </span>
+      </button>
+    </div>
+
+    <div class="sidebar-section sidebar-section-location">
+      <button class="sidebar-trigger" type="button" onclick="openSearch(); toggleSidebar();">
+        <span class="sidebar-trigger-label">Search City</span>
+        <span class="sidebar-trigger-meta">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="opacity:0.5"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
+        </span>
+      </button>
+    </div>
   </div>
 
   <div class="set-section-label">Appearance</div>
@@ -740,27 +758,7 @@
       </div>
       <div>
         <div class="city-name" id="display-city">Weather</div>
-        <div class="header-actions">
-          <div class="dots-menu">
-            <div class="icon-btn" id="btn-dots" onclick="toggleDotsMenu(event)" title="Options">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="5" r="1.2" fill="currentColor" stroke="none"/>
-                <circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
-                <circle cx="12" cy="19" r="1.2" fill="currentColor" stroke="none"/>
-              </svg>
-            </div>
-            <div class="dots-dropdown" id="dots-dropdown">
-              <button class="dots-dropdown-item" onclick="dotsAction('gps')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
-                Use My Location
-              </button>
-              <button class="dots-dropdown-item" onclick="dotsAction('search')">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><line x1="16" y1="16" x2="21" y2="21"/></svg>
-                Search City
-              </button>
-            </div>
-          </div>
-        </div>
+
       </div>
     </div>
     <div class="live-status hidden" id="live-status">
@@ -783,10 +781,7 @@
 
   <!-- Hero: Today only -->
   <div class="temp-section" id="hero-section">
-    <div class="sun-icon" id="weather-icon">
-      <!-- filled by renderTodayHero() -->
-    </div>
-    <div>
+<div>
       <div class="temp-row">
         <span class="temp-current" id="temp-current">--</span>
         <span class="temp-unit">°</span>
@@ -1164,7 +1159,6 @@ function renderTodayHero() {
   const currentCode = nowHourIdx >= 0 ? data.hourly.weather_code[nowHourIdx] : data.current.weather_code;
 
   document.getElementById('condition').textContent = wmoLabel(currentCode);
-  document.getElementById('weather-icon').innerHTML = wmoIcon(currentCode);
 }
 
 function buildChartPath(temps, svgWidth, svgHeight, padX, padY) {
@@ -1247,7 +1241,7 @@ function renderTodayChart() {
     ${points.map((point, index) => `<text x="${point[0]}" y="${point[1] - 8}" text-anchor="middle" font-family="Figtree" font-size="11" font-weight="700" fill="${lineColor}" opacity="0.6">${displayTemps[index]}&deg;</text>`).join('')}
     <circle cx="${liveX}" cy="${liveY}" r="10" fill="${dotColor}" opacity="0.08"/>
     <circle cx="${liveX}" cy="${liveY}" r="5" fill="${dotColor}" opacity="0.85"/>
-    <text x="${liveX}" y="${liveY - 16}" text-anchor="middle" font-family="Figtree" font-size="10" font-weight="800" fill="${dotColor}" opacity="0.9">${Math.round(currentTemp)}&deg;</text>
+
   `;
 
   timeAxis.innerHTML = displayIndices.map((index) => `<span class="time-tick">${fmtHour(data.hourly.time[hours[index]])}</span>`).join('');
@@ -1365,20 +1359,6 @@ function requestLocation() {
     { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
   );
 }
-
-// 3-dot menu
-function toggleDotsMenu(e) {
-  e.stopPropagation();
-  document.getElementById('dots-dropdown').classList.toggle('open');
-}
-function dotsAction(action) {
-  document.getElementById('dots-dropdown').classList.remove('open');
-  if (action === 'gps') requestLocation();
-  else if (action === 'search') openSearch();
-}
-document.addEventListener('click', () => {
-  document.getElementById('dots-dropdown').classList.remove('open');
-});
 
 document.getElementById('sidebar-overlay').addEventListener('click', () => toggleSidebar(false));
 document.getElementById('search-overlay').addEventListener('click', (event) => {
